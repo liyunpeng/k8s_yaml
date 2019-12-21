@@ -1,0 +1,48 @@
+$ cat << EOF > pod_busybox.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+  namespace: default
+spec:
+  containers:
+  - name: busybox
+    image: busybox:1.28.4
+
+    command:
+      - sleep
+      - "3600"
+
+    env:
+      - name: SPECIAL_KEY1
+        valueFrom:
+          configMapKeyRef:
+            name: cf-appvars     #引用的configmap的名字
+            key:  apploglevel
+      - name: SPECIAL_KEY2
+        valueFrom:
+          configMapKeyRef:
+            name: cf-appvars
+            key:  appVersion
+      - name: SPECIAL_KEY3
+        valueFrom:
+          configMapKeyRef:
+            name: cf-appvars
+            key:  os
+
+    imagePullPolicy: IfNotPresent
+
+  restartPolicy: Never
+
+$ kubectl apply -f pod_busybox.yaml
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,52 @@
+如果pod引用的configmap里面不存在的键，apply这个pod会报这样状态错误：
+$ kubectl get pod
+NAME                          READY   STATUS                       RESTARTS   AGE
+busybox                       0/1     CreateContainerConfigError   0          9m24s
+这是因为 pod_busybox.yaml引用的名字为cf-appvars的configmap里面，没有appVersion这个Key
+- name: SPECIAL_KEY2
+valueFrom:
+  configMapKeyRef:
+    name: cf-appvars
+    key:  appVersion
+解决办法， 去config_cf-appvars.yaml增加对这个key的定义，即在
+data:
+  apploglevel: info
+这个data里面增减一个键值对定义：
+data:
+  apploglevel: info
+  appVersion: v1.0
+
+更新这个configmap：
+$ kubectl apply -f config_cf_appvars.yaml
+
+查看configmap:
+$ kubectl describe configmap cf-appvars
+Name:         cf-appvars
+Namespace:    default
+Labels:       app=configmap
+              project=lykops
+              software=apache
+              version=v1
+Annotations:  kubectl.kubernetes.io/last-applied-configuration:
+                {"apiVersion":"v1","data":{"appVersion":"v1.0","apploglevel":"info","os":"linux"},"kind":"ConfigMap","metadata":{"annotations":{},"labels"...
+
+Data
+====
+appVersion:
+----
+v1.0
+apploglevel:
+----
+info
+Events:  <none>
+
+    这时再去看busybox， 这时状态已经更新了，说明configmap的更新会同步到引用他的pod，
+达到配置即时应用到pod的目的。
+$ kubectl get pod
+NAME                          READY   STATUS             RESTARTS   AGE
+busybox                       1/1     Running            0          4m56s
+
+
+
+
+

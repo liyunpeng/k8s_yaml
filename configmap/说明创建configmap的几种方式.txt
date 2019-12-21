@@ -1,0 +1,41 @@
+configmap名字写在kubectl命令的方式，键值对写在文件里，在kubectl命令指定这个文件名
+$ cat << EOF > env.txt
+>
+> config1=xxx
+>
+> config2=yyy
+>
+> EOF
+$ kubectl create configmap myconfigmap --from-env-file=env.txt
+
+$ kubectl get configmap
+NAME            DATA   AGE
+myconfigmap     2      2m6s
+
+$ kubectl delete configmap myconfigmap
+configmap "myconfigmap" deleted
+
+$ kubectl get configmap
+NAME            DATA   AGE
+
+=========================================================================================
+第二种方式： configmap名字和键值对都写在yaml文件中
+$ cat << EOF > config_cf_appvars.yaml
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: cf-appvars
+  namespace: default
+  labels:
+    software: apache
+    project: lykops
+    app: configmap
+    version: v1
+data:
+  apploglevel: info
+  appVersion: v1.0
+  os: linux
+EOF
+
+$ kubectl apply -f config_cf_appvars.yaml
+推荐第二种方式，实验中的configmap来自于第二种方式
