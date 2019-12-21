@@ -1,0 +1,33 @@
+apiVersion: v1 
+kind: Pod 
+metadata:
+  name: lykops-cm-pod
+  labels:
+    project: lykops
+    app: lykops-cm
+    version: v1      
+spec:
+  containers:
+  - name: lykops-cm-pod
+    image: web:apache 
+    command: ['sh',/etc/run.sh] 
+    env:
+    - name: SPECIAL_USER
+      valueFrom:
+        configMapKeyRef:
+          name: lykops-config
+          key: username
+    resources: 
+      requests: 
+        cpu: 0.01 
+        memory: 8Mi 
+      limits: 
+        cpu: 0.1
+        memory: 16Mi
+    volumeMounts:
+    - name: config-volume
+      mountPath: /data/
+  volumes:
+    - name: config-volume
+      configMap:
+        name: lykops-config

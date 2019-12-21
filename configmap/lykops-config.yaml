@@ -1,0 +1,17 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: lykops-config
+  namespace: default  
+  labels:
+    software: apache
+    project: lykops
+    app: configmap
+    version: v1
+data:
+  PWD: /
+  user: lykops
+  mysql.config : |-
+    username: lykops
+    host: localhost
+    port: 3306
