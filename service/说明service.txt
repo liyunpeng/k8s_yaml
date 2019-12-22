@@ -1,0 +1,41 @@
+$cat svc_1.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-1-name
+  labels:
+    name: svc-1-label
+spec:
+  ports:
+  - port: 8081
+    targetPort: 8080
+    name: web
+
+  - port: 8085
+    targetPort: 8080
+    name: management
+
+  selector:
+    name: webapp2
+service是一个服务代理，本身不提供服务，service会把服务请求按负载均衡分配后端的一个pod上，真正提供服务的是pod
+后端这些pod一般都是rc启动的， 一个pod里要启动那些容器，和维护多少Pod副本，都是由rc的yaml文件完整描述
+service通过selector的name匹配到后端的pod副本集合，按负载均衡从pod副本集合里取一个Pod。
+pod里可以放多个容器，容器之前协调工作，比如有nginx-php容器，MySQL容器，redis容器，kafka容器，
+这些构成了一个web应用
+service服务请求转给pod里具体的一个容器，而不是传给pod里的所有容器。
+所以service的selector name 不是和rc的label匹配，也不是和pod的label匹配
+而是和具体容器的label匹配。 达到service对接到具体容器的目的。
+    上面的select name是错误的， 但service的状态并没有报错：
+$ kubectl get svc
+c-1-name      ClusterIP   10.100.23.252   <none>        8081/TCP,8085/TCP            53m
+    可见，就算service没有匹配到后端的真正进行服务的容器，也不会报错， 只是这个service无法访问
+$ curl 10.100.23.252:8081
+curl: (7) Failed to connect to 10.100.23.252 port 8081: Connection refused
+    把selector name改成容器的lable,即：
+  selector:
+    name: rc-tomcat-template-label
+master@etcd0:~/k8s_yaml/service$ kubectl apply -f svc_1.yaml
+service/svc-1-name configured
+    此时再去访问，8081 8085 都成功访问
+    $ curl 10.100.23.252:8081
+    $ curl 10.100.23.252:8085

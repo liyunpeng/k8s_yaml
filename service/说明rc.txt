@@ -1,0 +1,45 @@
+$ cat rc_tomcat.yaml
+apiVersion: v1
+kind: ReplicationController
+metadata:
+   name: rc-tomcat
+   labels:
+     name: rc-tomcat-label
+spec:
+  replicas: 1
+  template:
+    metadata:
+     labels:
+       name: rc-tomcat-template-label
+    spec:
+      containers:  #一个pod里面可以运行多个container, 这里只运行一个镜像为tomcat的container， 只有container可以运行镜像
+      - name: rc-tomcat-container-1
+        image: tomcat
+        ports:  # k8s会为每个pod默认指定一个ip地址，但端口一般需要yaml文件自己指定
+        - containerPort: 8080
+
+master@etcd0:~/k8s_yaml/service$ kubectl create -f rc_tomcat.yaml
+replicationcontroller/rc-tomcat created
+
+创建rc后，可以查看rc的名字是文件中指定的
+master@etcd0:~/k8s_yaml/service$ kubectl get rc
+NAME        DESIRED   CURRENT   READY   AGE
+rc-tomcat   1         1         0       5s
+
+rc会创建replicas指定个数的Pod, 这里为1个，并且运行这些pod，
+master@etcd0:~/k8s_yaml/service$ kubectl get po -o wide
+rc-tomcat-n8ghp               1/1     Running            0          20m     192.169.0.64   etcd0        <none>           <none>
+
+rc的yaml生成了pod, 但yaml并没有指定pod的名字， k8s就为pod取的名字的规则是， rc的名字加五位的随机码，这里就是：
+rc-tomcat-n8ghp。
+
+k8s集群内部的主机可以通过ip访问这个pod：
+$ curl 192.169.0.64:8080
+
+但是k8s集群外的主机是不能访问这个pod.
+
+
+
+
+
+
