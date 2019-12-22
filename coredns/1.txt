@@ -1,0 +1,61 @@
+$sudo apt-get install jq
+
+$./deploy.sh -i 10.254.0.2 -d test.com > coredns.yaml
+
+$ kubectl apply -f coredns.yaml
+serviceaccount/coredns unchanged
+clusterrole.rbac.authorization.k8s.io/system:coredns unchanged
+clusterrolebinding.rbac.authorization.k8s.io/system:coredns unchanged
+configmap/coredns unchanged
+deployment.apps/coredns unchanged
+service/kube-dns unchanged
+master@etcd0:~/githubRef/deployment$ kubectl exec busybox -- nslookup master
+nslookup: can't resolve 'master'
+Server:    10.96.0.10
+Address 1: 10.96.0.10 kube-dns.kube-system.svc.test.com
+
+command terminated with exit code 1
+
+
+
+master@etcd0:~/githubRef/deployment/kubernetes$ kubectl get endpoints
+NAME         ENDPOINTS                             AGE
+kubernetes   192.168.0.204:6443                    3d16h
+myapp-svc    192.169.0.52:80,192.169.1.12:80       40h
+mysql        192.169.0.55:3306                     2d16h
+svc-1-name   192.169.0.64:8080,192.169.0.64:8080   3h15m
+
+-------------------------------------
+master@etcd0:~/k8s_yaml$ kubectl exec busybox -- nslookup redis-master
+Server:    10.96.0.10
+Address 1: 10.96.0.10 kube-dns.kube-system.svc.test.com
+
+nslookup: can't resolve 'redis-master'
+
+
+-------------------------------------coredns.yaml.sed
+                                     coredns.yaml
+                                     deploy.sh
+
+master@etcd0:~$ kubectl get pod -n=kube-system
+NAME                            READY   STATUS    RESTARTS   AGE
+calico-node-m8594               2/2     Running   10         3d16h
+calico-node-pllt7               2/2     Running   13         3d16h
+coredns-6dcff984f9-9cb94        1/1     Running   0          48m
+coredns-6dcff984f9-kmwkm        1/1     Running   0          48m
+etcd-etcd0                      1/1     Running   13         3d16h
+kube-apiserver-etcd0            1/1     Running   12         3d16h
+kube-controller-manager-etcd0   1/1     Running   21         3d16h
+kube-proxy-vdlsr                1/1     Running   6          3d16h
+kube-proxy-zh4lr                1/1     Running   4          3d16h
+kube-scheduler-etcd0            1/1     Running   22         3d16h
+
+master@etcd0:~$ kubectl get svc -n=kube-system
+NAME           TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                  AGE
+calico-typha   ClusterIP   10.104.186.91   <none>        5473/TCP                 3d16h
+kube-dns       ClusterIP   10.96.0.10      <none>        53/UDP,53/TCP,9153/TCP   3d16h
+
+master@etcd0:~$ kubectl get deployment -n=kube-system
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+calico-typha   0/0     0            0           3d16h
+coredns        2/2     2            2           3d16h
