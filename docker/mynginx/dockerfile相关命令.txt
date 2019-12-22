@@ -1,0 +1,97 @@
+node1@ubuntu:~/k8s_yaml/docker/mynginx$ sudo docker build -t nginx:v3 .
+命令中的. 表示当前目录，即Dockerfile就在当前目录
+
+Sending build context to Docker daemon  2.048kB
+Step 1/2 : FROM nginx
+latest: Pulling from library/nginx
+000eee12ec04: Pull complete
+eb22865337de: Pull complete
+bee5d581ef8b: Pull complete
+Digest: sha256:50cf965a6e08ec5784009d0fccb380fc479826b6e0e65684d9879170a9df8566
+Status: Downloaded newer image for nginx:latest
+ ---> 231d40e811cd
+Step 2/2 : RUN echo '<h1>Hello, Docker!</h1>' > /usr/share/nginx/html/index.html
+ ---> Running in bdcdecda385e
+Removing intermediate container bdcdecda385e
+ ---> 2148ed540194
+Successfully built 2148ed540194
+Successfully tagged nginx:v3
+
+
+新build出来的镜像在docker images看到， 
+node1@ubuntu:~/k8s_yaml/docker/mynginx$ sudo docker images
+REPOSITORY                 TAG                 IMAGE ID            CREATED             SIZE
+nginx                      v3                  2148ed540194        2 minutes ago       126MB
+nginx                      latest              231d40e811cd        4 weeks ago         126MB
+
+node1@ubuntu:~/k8s_yaml/docker/mynginx$ sudo docker run -it nginx:v3 /bin/bash
+root@28b6128bd0b1:/# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+root@28b6128bd0b1:/# cat /usr/share/nginx/html/index.html
+<h1>Hello, Docker!</h1>
+dockerfile里的命令生成的
+root@28b6128bd0b1:/# /etc/init.d/nginx restart
+[ ok ] Restarting nginx: nginx.
+root@28b6128bd0b1:/# cat /etc/issue
+Debian GNU/Linux 10 \n \l
+此nginx时基于bedian的镜像
+root@28b6128bd0b1:/# exit 推出docker容器的交互
+
+-----------------------------------------------------
+node1@ubuntu:~/k8s_yaml/docker/mynginx$ sudo docker run -d -p 8080:80 --name nginx123  nginx:v3
+7a40d4f47a25609d35ab1538d7600f93eb031965508fa88d5b8ce06aec40ca25
+
+node1@ubuntu:~/k8s_yaml/docker/mynginx$ sudo docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                  NAMES
+7a40d4f47a25        nginx:v3            "nginx -g 'daemon of…"   43 seconds ago      Up 39 seconds       0.0.0.0:8080->80/tcp   nginx123
+进入交互方式
+node1@ubuntu:~/k8s_yaml/docker/mynginx$ sudo docker exec -it nginx123 bash
+root@7a40d4f47a25:/# exit
+exit
+node1@ubuntu:~/k8s_yaml/docker/mynginx$ sudo docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                  NAMES
+7a40d4f47a25        nginx:v3            "nginx -g 'daemon of…"   About a minute ago   Up About a minute   0.0.0.0:8080->80/tcp   nginx123
+
+也可以id
+node1@ubuntu:~/k8s_yaml/docker/mynginx$ sudo docker exec -it 7a40d4f47a25  bash
+root@7a40d4f47a25:/#
+
+查看容器ip
+root@c432329eb901:/# /etc/init.d/nginx start
+root@c432329eb901:/# ifconfig
+bash: ifconfig: command not found
+root@c432329eb901:/# cat /etc/host
+host.conf  hostname   hosts
+root@c432329eb901:/# cat /etc/host
+host.conf  hostname   hosts
+root@c432329eb901:/# cat /etc/hosts
+127.0.0.1       localhost
+::1     localhost ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+172.17.0.2      c432329eb901
+
+
+node1@ubuntu:~/k8s_yaml/docker/mynginx$ curl http://172.17.0.2
+<h1>Hello, Docker!</h1>
+
+node1 是ubuntu, 地址为192.168.0.211， 
+因为docker的80端口映射到了宿主机的8088端口，
+用windows来访问ubuntu, 在windows浏览器输入
+http://192.168.0.211:8088
+页面显示：
+Hello, Docker!
+
+http://192.168.0.211:80 则没有显示
+说明端口映射成功
+
+
+
+
+
+
+
+
+

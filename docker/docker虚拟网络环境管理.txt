@@ -1,0 +1,53 @@
+docker环境：
+启动并进入docker1容器交互， 即进入docker环境：
+user1@ubuntu:~$ sudo docker run -it --name docker1 ubuntu bash
+root@e2bfe689d802:/# ll /proc/self/ns/net
+lrwxrwxrwx 1 root root 0 Sep 14 03:37 /proc/self/ns/net -> 'net:[4026532781]'
+每个进程都有自己的namespace, 'net:[4026532781]'是这个namespace 的id
+15188
+
+
+本机环境：
+得到docker1的全部元数据
+docker inspect docker1
+
+得到docker容器的pid
+user1@ubuntu:~$ sudo docker inspect docker1 --format='{{ .State.Pid}}'
+
+得到docker1的地址
+docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' docker1 
+172.17.0.2
+
+查看docker1容器进程（一个容器是一个进程）的ns的编号
+user1@ubuntu:~$ sudo ls /proc/15188/ns/net -l
+lrwxrwxrwx 1 root root 0 Sep 13 20:55 /proc/15188/ns/net -> 'net:[4026532781]'
+
+所有的ip nets可以操作的虚拟网络环境都在/var/run/netns目录下， docker1也是一个虚拟网络环境， 上面用docker inspect 查到docker1的地址是172.17.0.2， docker有自己的ip地址， docker就是一个虚拟网络环境， 但是他仅有在/proc/进程id/ns/net下有自己的虚拟网络目录， 在/var/run/netns下没有， 为了让ip nets能操作到docker的虚拟网络环境， 就要在/var/run/netns下创建指向docker虚拟网络目录的链接文件， 创建命令为：
+user1@ubuntu:~$ sudo ln -s /proc/15188/ns/net /var/run/netns/docker1
+
+查看创建好的链接文件
+user1@ubuntu:~$ ll /var/run/netns/docker1
+lrwxrwxrwx 1 root root 18 Sep 13 20:56 /var/run/netns/docker1 -> /proc/15188/ns/net
+
+/var/run/netns目录下就有了docker的虚拟网络环境的文件，这样 ip netns就能操作这个虚拟网络环境了：
+user1@ubuntu:~$ sudo ip netns list
+docker1 (id: 0)  // 用的时候忽略id:0
+ip_ns2
+mytest
+
+查看docker1虚拟网络环境的ip 地址
+user1@ubuntu:~$ sudo ip netns exec docker1 ip addr
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+12: eth0@if13: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether 02:42:ac:11:00:02 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 172.17.0.2/16 brd 172.17.255.255 scope global eth0
+       valid_lft forever preferred_lft forever
+这里看到的 172.17.0.2 就是用docker inspect查到的地址， 即docker1的地址
+接下来，就可以给docker1容器的虚拟网路环境添加虚拟网卡，启动虚拟网卡，为虚拟网卡配置地址
+
+docker pull下来的ubuntu镜像里没有i
+
+docker官方已不推荐使用docker run --link来链接2个容器互相通信，随后的版本中会删除--link，
