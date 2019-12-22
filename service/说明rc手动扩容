@@ -1,0 +1,33 @@
+查看rc
+$ kubectl get rc
+NAME        DESIRED   CURRENT   READY   AGE
+rc-tomcat   1         1         1       6h3m
+
+查看当前rc下的Pod：
+$ kubectl get pod
+rc-tomcat-n8ghp               1/1     Running             0          6h4m
+
+手动扩容， 将副本数变为1个变为2个
+$ kubectl  scale  rc  rc-tomcat  --replicas=2
+replicationcontroller/rc-tomcat scaled
+查看rc
+$ kubectl get rc
+NAME        DESIRED   CURRENT   READY   AGE
+rc-tomcat   2         2         1       6h4m
+查看pod, 看到有个一pod正在生成容器， 这是手动扩容的结果
+$ kubectl get pod
+NAME                          READY   STATUS              RESTARTS   AGE
+rc-tomcat-n8ghp               1/1     Running             0          6h4m
+rc-tomcat-rpzf9               0/1     ContainerCreating   0          7s
+
+手动缩容，还是scale命令，就是replica变为了1
+master@etcd0:~/k8s_yaml/service$ kubectl   scale  rc  rc-tomcat  --replicas=1
+replicationcontroller/rc-tomcat scaled
+
+master@etcd0:~/k8s_yaml/service$ kubectl get rc
+NAME        DESIRED   CURRENT   READY   AGE
+rc-tomcat   1         1         1       6h10m
+
+master@etcd0:~/k8s_yaml/service$ kubectl get pod
+NAME                          READY   STATUS             RESTARTS   AGE
+rc-tomcat-n8ghp               1/1     Running            0          6h10m
