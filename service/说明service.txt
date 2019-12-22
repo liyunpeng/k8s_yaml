@@ -17,7 +17,7 @@ spec:
 
   selector:
     name: webapp2
-service是一个服务代理，本身不提供服务，service会把服务请求按负载均衡分配后端的一个pod上，真正提供服务的是pod
+    service是一个服务代理，本身不提供服务，service会把服务请求按负载均衡分配后端的一个pod上，真正提供服务的是pod
 后端这些pod一般都是rc启动的， 一个pod里要启动那些容器，和维护多少Pod副本，都是由rc的yaml文件完整描述
 service通过selector的name匹配到后端的pod副本集合，按负载均衡从pod副本集合里取一个Pod。
 pod里可以放多个容器，容器之前协调工作，比如有nginx-php容器，MySQL容器，redis容器，kafka容器，
@@ -39,3 +39,5 @@ service/svc-1-name configured
     此时再去访问，8081 8085 都成功访问
     $ curl 10.100.23.252:8081
     $ curl 10.100.23.252:8085
+
+

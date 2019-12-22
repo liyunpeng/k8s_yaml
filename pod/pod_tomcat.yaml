@@ -1,13 +1,14 @@
 apiVersion: v1
 kind: Pod 
 metadata:
-  name: webapp-pod
+  name: pod-tomcat
   labels:
     name: pod-webapp-lable
 spec:
   containers:
-    - name: webapp-pod-container
+    - name: pod-tomcat-container
       image: tomcat
+      imagePullPolicy: Never
       env:
       - name: ENV_TEST_1
         value: env_test_1
@@ -15,4 +16,4 @@ spec:
         value: env_test_2
       ports:
       - containerPort: 8080
-        hostPort: 8082
+       # hostPort: 8089 失效

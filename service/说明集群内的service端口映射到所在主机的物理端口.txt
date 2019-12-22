@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-1-name
+  labels:
+    name: svc-1-label
+spec:
+  type: NodePort
+  ports:
+  - port: 8081
+    targetPort: 8080  # container的端口
+    nodePort: 30001
+    name: web
+
+  - port: 8085
+    targetPort: 8080
+    name: management
+
+  selector:
+    name: rc-tomcat-template-label
+
+master@etcd0:~/k8s_yaml/pod$ kubectl apply -f ../service/svc_1.yaml
+The Service "svc-1-name" is invalid: spec.ports[0].nodePort: Invalid value: 8090: provided port is not in the valid range. The range of valid ports is 30000-32767
+
+master@etcd0:~/k8s_yaml/pod$ kubectl get svc
+NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                         AGE
+svc-1-name      NodePort    10.100.23.252   <none>        8081:30001/TCP,8085:30952/TCP   72m
+    服务svc-1-name两组端口。
+    每组端口有给集群内部的访问端口， 和映射到主机的端口， 即集群外部可以访问的端口
+    本次实验，集群master所在ubuntu主机的ip是192.168.0.204，
+    集群映射到外部的地址就是192.168.0.204:30001
+    在windows主机可以访问这个地址， 浏览器输入
+    http://192.168.0.204:30001 可以看到tomcat的主页
+    但是http://192.168.0.204:30952 访问不到
