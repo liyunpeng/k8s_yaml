@@ -17,7 +17,16 @@ $ sudo docker build -t nginx:v3 .
 新镜像的名字和tag由docker build里面的-t参数制定，这里为 nginx:v3。 镜像名和tag用冒号分隔。
 新镜像的名字可以相同，也可以不相同。
 如果相同， 需要加上tag.  以区别原镜像。 
-以下是命令执行过程中的输出log, 
+下载过程中会显示下载进度， 采用多路下载并行的方式， 一般是三路下载， 比如下载build时下载的镜像比较大， 会有这样现在进度的log：
+3d77ce4481b1: Downloading [============>                                      ]  13.99MB/54.26MB
+7d2f32934963: Downloading [======================================>            ]  13.38MB/17.58MB
+0c5cf711b890: Downloading [===============>                                   ]  13.31MB/43.6MB
+9593dc852d6b: Waiting
+4e3b8a1eb914: Waiting
+ddcf13cc1951: Waiting
+86175f4e9cc5: Waiting
+5a08bdd82f61: Waiting
+以下是$ sudo docker build -t nginx:v3 . 命令执行结束时的log： 
 Sending build context to Docker daemon  2.048kB
 Step 1/2 : FROM nginx
 latest: Pulling from library/nginx
