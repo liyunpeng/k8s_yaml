@@ -1,0 +1,239 @@
+master@ubuntu:~/k8s_yaml/deploment/nodejs$ sudo docker build -t wucong60/kube-node-demo1:v1 .
+Sending build context to Docker daemon  3.072kB
+Step 1/5 : FROM node:8.11.2
+8.11.2: Pulling from library/node
+3d77ce4481b1: Downloading [============>                                      ]  13.99MB/54.26MB
+7d2f32934963: Downloading [======================================>            ]  13.38MB/17.58MB
+0c5cf711b890: Downloading [===============>                                   ]  13.31MB/43.6MB
+9593dc852d6b: Waiting
+4e3b8a1eb914: Waiting
+ddcf13cc1951: Waiting
+86175f4e9cc5: Waiting
+5a08bdd82f61: Waiting
+
+
+master@ubuntu:~/k8s_yaml/deploment/nodejs$ sudo docker build -t wucong60/kube-node-demo1:v1 .
+Sending build context to Docker daemon  3.072kB
+Step 1/5 : FROM node:8.11.2
+8.11.2: Pulling from library/node
+3d77ce4481b1: Pull complete
+7d2f32934963: Pull complete
+0c5cf711b890: Pull complete
+9593dc852d6b: Pull complete
+4e3b8a1eb914: Pull complete
+ddcf13cc1951: Pull complete
+86175f4e9cc5: Pull complete
+5a08bdd82f61: Pull complete
+Digest: sha256:27de81e59a343a4345d800f37582cc326d215d8527874c7886e498627be2f330
+Status: Downloaded newer image for node:8.11.2
+ ---> baf6417c4cac
+Step 2/5 : WORKDIR app
+ ---> Running in c14107244456
+Removing intermediate container c14107244456
+ ---> 997e819058c6
+Step 3/5 : COPY . .
+ ---> 6f2d70e2a6ee
+Step 4/5 : EXPOSE 8081
+ ---> Running in b0d26c1e937c
+Removing intermediate container b0d26c1e937c
+ ---> 1b6f4f1a8378
+Step 5/5 : ENTRYPOINT [ "node","server.js" ]
+ ---> Running in 13322d436768
+Removing intermediate container 13322d436768
+ ---> 6ea706f0d607
+Successfully built 6ea706f0d607
+Successfully tagged wucong60/kube-node-demo1:v1
+
+
+master@ubuntu:~/k8s_yaml/deploment/nodejs$ sudo docker login --username lijincheng1
+Password:
+WARNING! Your password will be stored unencrypted in /home/master/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+
+
+master@ubuntu:~/k8s_yaml/docker/mynginx$  sudo docker build -t nginx:v8 .
+Sending build context to Docker daemon   7.68kB
+Step 1/2 : FROM nginx
+latest: Pulling from library/nginx
+000eee12ec04: Already exists
+eb22865337de: Pull complete
+bee5d581ef8b: Pull complete
+Digest: sha256:50cf965a6e08ec5784009d0fccb380fc479826b6e0e65684d9879170a9df8566
+Status: Downloaded newer image for nginx:latest
+ ---> 231d40e811cd
+Step 2/2 : RUN echo '<h1>Hello, Docker!</h1>' > /usr/share/nginx/html/index.html
+ ---> Running in f4a40e6f9420
+Removing intermediate container f4a40e6f9420
+ ---> 7837e0ef0963
+Successfully built 7837e0ef0963
+Successfully tagged nginx:v8
+master@ubuntu:~/k8s_yaml/docker/mynginx$ sudo docker push nginx:v8
+The push refers to repository [docker.io/library/nginx]
+f2103622e6cd: Preparing
+4fc1aa8003a3: Preparing
+5fb987d2e54d: Preparing
+831c5620387f: Preparing
+denied: requested access to the resource is denied
+
+
+修改镜像名， 重新push
+master@ubuntu:~/k8s_yaml/docker/mynginx$ sudo docker images
+REPOSITORY                                                        TAG                 IMAGE ID            CREATED           
+
+  SIZE
+nginx                                                             v8                  7837e0ef0963        4 minutes ago     
+
+  126MB
+nodejs_demo123                                                    v1                  6ea706f0d607        29 minutes ago    
+
+  673MB
+wucong60/kube-node-demo1                                          v1                  6ea706f0d607        29 minutes ago    
+
+  673MB
+
+
+
+
+master@ubuntu:~/k8s_yaml/docker/mynginx$ sudo docker tag 7837e0ef0963 lijincheng1/nginx:v8
+master@ubuntu:~/k8s_yaml/docker/mynginx$ sudo docker push 7837e0ef0963
+The push refers to repository [docker.io/library/7837e0ef0963]
+An image does not exist locally with the tag: 7837e0ef0963
+master@ubuntu:~/k8s_yaml/docker/mynginx$ sudo docker images
+REPOSITORY                                                        TAG                 IMAGE ID            CREATED           
+
+  SIZE
+nginx                                                             v8                  7837e0ef0963        6 minutes ago     
+
+  126MB
+lijincheng1/nginx                                                 v8                  7837e0ef0963        6 minutes ago     
+
+  126MB
+nodejs_demo123                                                    v1                  6ea706f0d607        31 minutes ago    
+
+  673MB
+
+
+
+master@ubuntu:~/k8s_yaml/docker/mynginx$ sudo docker push lijincheng1/nginx:v8
+The push refers to repository [docker.io/lijincheng1/nginx]
+f2103622e6cd: Pushed
+4fc1aa8003a3: Mounted from library/nginx
+5fb987d2e54d: Mounted from library/nginx
+831c5620387f: Mounted from library/nginx
+v8: digest: sha256:939989b477d757ed9b13ddd630783467be042f2a8d4f4dff5cb8bd1902e48c8b size: 1155
+
+https://hub.docker.com/
+可以看到自己push的镜像
+lijincheng1 / nginx
+
+k8s引用自己的pod
+
+deployment.extensions/deployment-nginx-v8 created
+master@ubuntu:~/k8s_yaml/deploment$ kubectl get pod
+NAME                                   READY   STATUS              RESTARTS   AGE
+deployment-nginx-v8-7489dbcdc4-bv4fp   0/1     ContainerCreating   0          3s
+deployment-nginx-v8-7489dbcdc4-trx92   0/1     ContainerCreating   0          3s
+myapp-test-7cdcb494b6-42dtk            1/1     Running             1          2d23h
+myapp-test-7cdcb494b6-zdw8g            1/1     Running             1          2d23h
+master@ubuntu:~/k8s_yaml/deploment$ kubectl get pod
+NAME                                   READY   STATUS    RESTARTS   AGE
+deployment-nginx-v8-7489dbcdc4-bv4fp   1/1     Running   0          6s
+deployment-nginx-v8-7489dbcdc4-trx92   1/1     Running   0          6s
+myapp-test-7cdcb494b6-42dtk            1/1     Running   1          2d23h
+myapp-test-7cdcb494b6-zdw8g            1/1     Running   1          2d23h
+
+会运行本地的镜像
+master@ubuntu:~/k8s_yaml/deploment$ sudo docker rmi lijincheng1/nginx:v8
+Error response from daemon: conflict: unable to remove repository reference "lijincheng1/nginx:v8" (must force) - container 
+
+20ceafb89f82 is using its referenced image 7837e0ef0963
+master@ubuntu:~/k8s_yaml/deploment$ sudo docker ps -a | grep 9f82
+20ceafb89f82        7837e0ef0963                                                     "nginx -g 'daemon of…"   2 minutes 
+
+ago       Up 2 minutes                                  k8s_deployment-web-container_deployment-nginx-v8-7489dbcdc4-
+
+trx92_default_990f60ce-dd33-4d44-887c-2f21f9fcf752_0
+
+
+master@ubuntu:~/k8s_yaml/deploment$ kubectl get deployment
+NAME                  READY   UP-TO-DATE   AVAILABLE   AGE
+deployment-nginx-v8   2/2     2            2           5m45s
+myapp-test            2/2     2            2           2d23h
+
+
+
+master@ubuntu:~/k8s_yaml/deploment$ kubectl delete deployment deployment-nginx-v8
+deployment.extensions "deployment-nginx-v8" deleted
+master@ubuntu:~/k8s_yaml/deploment$ sudo docker rmi lijincheng1/nginx:v8
+Untagged: lijincheng1/nginx:v8
+Untagged: lijincheng1/nginx@sha256:939989b477d757ed9b13ddd630783467be042f2a8d4f4dff5cb8bd1902e48c8b
+Deleted: sha256:7837e0ef0963184c7b317a25d2d7cfa3c758fd45cf97c5f998ead91ed799f709
+Deleted: sha256:e8ce411b01ca4f2c76a09421a587eee2587025f884515fe61e2cf049bfdec378
+
+master@ubuntu:~/k8s_yaml/deploment$ sudo docker images
+REPOSITORY                                                        TAG                 IMAGE ID            CREATED           
+
+  SIZE
+nodejs_demo123                                                    v1                  6ea706f0d607        About an hour ago 
+
+  673MB
+wucong60/kube-node-demo1                                          v1                  6ea706f0d607        About an hour ago 
+
+  673MB
+httpd                                                             latest              2ae34abc2ed0        3 weeks ago       
+
+  165MB
+
+
+
+从远端拉取
+
+master@ubuntu:~/k8s_yaml/deploment$ kubectl apply -f deployment.yaml
+deployment.extensions/deployment-nginx-v8 created
+master@ubuntu:~/k8s_yaml/deploment$ kubectl get pod
+NAME                                   READY   STATUS              RESTARTS   AGE
+deployment-nginx-v8-7489dbcdc4-d2vkg   0/1     ContainerCreating   0          8s
+deployment-nginx-v8-7489dbcdc4-n4wm2   0/1     ContainerCreating   0          8s
+myapp-test-7cdcb494b6-42dtk            1/1     Running             1          2d23h
+myapp-test-7cdcb494b6-zdw8g            1/1     Running             1          2d23h
+master@ubuntu:~/k8s_yaml/deploment$ kubectl get pod
+NAME                                   READY   STATUS              RESTARTS   AGE
+deployment-nginx-v8-7489dbcdc4-d2vkg   0/1     ContainerCreating   0          17s
+deployment-nginx-v8-7489dbcdc4-n4wm2   1/1     Running             0          17s
+myapp-test-7cdcb494b6-42dtk            1/1     Running             1          2d23h
+myapp-test-7cdcb494b6-zdw8g            1/1     Running             1          2d23h
+master@ubuntu:~/k8s_yaml/deploment$ kubectl get pod
+NAME                                   READY   STATUS              RESTARTS   AGE
+deployment-nginx-v8-7489dbcdc4-d2vkg   0/1     ContainerCreating   0          19s
+deployment-nginx-v8-7489dbcdc4-n4wm2   1/1     Running             0          19s
+myapp-test-7cdcb494b6-42dtk            1/1     Running             1          2d23h
+myapp-test-7cdcb494b6-zdw8g            1/1     Running             1          2d23h
+master@ubuntu:~/k8s_yaml/deploment$ kubectl get pod
+NAME                                   READY   STATUS              RESTARTS   AGE
+deployment-nginx-v8-7489dbcdc4-d2vkg   0/1     ContainerCreating   0          20s
+deployment-nginx-v8-7489dbcdc4-n4wm2   1/1     Running             0          20s
+myapp-test-7cdcb494b6-42dtk            1/1     Running             1          2d23h
+myapp-test-7cdcb494b6-zdw8g            1/1     Running             1          2d23h
+master@ubuntu:~/k8s_yaml/deploment$ kubectl get pod
+NAME                                   READY   STATUS              RESTARTS   AGE
+deployment-nginx-v8-7489dbcdc4-d2vkg   0/1     ContainerCreating   0          23s
+deployment-nginx-v8-7489dbcdc4-n4wm2   1/1     Running             0          23s
+myapp-test-7cdcb494b6-42dtk            1/1     Running             1          2d23h
+myapp-test-7cdcb494b6-zdw8g            1/1     Running             1          2d23h
+
+apply 之后可以看到右有了lijincheng1/nginx 这个镜像
+
+master@ubuntu:~/k8s_yaml/deploment$ kubectl get pod
+NAME                                   READY   STATUS              RESTARTS   AGE
+deployment-nginx-v8-7489dbcdc4-579dx   1/1     Running             0          23s
+deployment-nginx-v8-7489dbcdc4-kjbnd   0/1     ContainerCreating   0          23s
+myapp-test-7cdcb494b6-42dtk            1/1     Running             1          2d23h
+myapp-test-7cdcb494b6-zdw8g            1/1     Running             1          2d23h
+master@ubuntu:~/k8s_yaml/deploment$ sudo docker images | grep liji
+lijincheng1/nginx                                                 v8                  7837e0ef0963        23 minutes ago    
+
+  126MB
+
