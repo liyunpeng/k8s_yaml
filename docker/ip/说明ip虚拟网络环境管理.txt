@@ -13,12 +13,27 @@ $ sudo ip netns exec ns1 bash
 root@lfgphicprd19011:/# ls
 bin  boot  dev  etc  home  initrd.img  lib  lib32  lib64  libx32  lost+found  media  mnt  opt  proc  root  run  sbin  snap  srv  sys  tmp  usr  var  vmlinuz
 root@lfgphicprd19011:/# ifconfig
-ifconfig显示为空， 说明当前的网络环境没有网卡
+ifconfig显示为空， 说明当前的网络环境没有带有地址的网卡
 
-root@lfgphicprd19011:/# ip a
+root@lfgphicprd19011:/# ip a  
 1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN group default qlen 1
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-可见刚开始创建的虚拟网络环境并没有自己的网卡。 
+只有一个回环设备， 但没有启动
+启动回环设备：
+user1@ubuntu:~$ sudo ip netns exec ns1 ip link set dev lo up
+再进到mytest的bash看
+user1@ubuntu:~$ sudo ip netns exec ns1 bash
+root@ubuntu:~# ifconfig
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+以上是sudo ip netns exec mytest ip link set dev lo up建立回环设备的结果
+
 ================================================================================
 link选项：
 为了给虚拟网络环境添加网卡， 需要link选项操作链路层以创建网卡，然后link选项把这个网卡添加到虚拟网络环境。
@@ -56,54 +71,22 @@ $ sudo ip netns exec ns1 bash
 root@lfgphicprd19011:~/# cd
 root@lfgphicprd19011:~# ls /home
 master  // 宿主机的用户目录
+root@lfgphicprd19011:~# echo a > /home/master/1.txt
+除了网络相关的命令， 其他命令产生的结果也会直接作用到宿主机, 这个命令在宿主机也会产生一个1.txt文件
+ip link，ip addr. 这样的命令虚拟网络环境里操作不会影响到宿主机，因为虚拟网络环境和宿主机网络环境是相互隔离的
+
 进程不隔离， 意味着宿主机的所有进程在虚拟网络环境同样可见， 如
 root@lfgphicprd19011:~/# top 
 看到的进程和宿主机是相同的。 
+
 
 docker的意义在于实现网络环境，进程，文件系统等所有资源的隔离， 以极轻量化方式实现了虚拟机效果， 为服务集群部署提供了高效而稳固的基础。 
 由于docker的容器副本的维护还礼，容器所需的环境变量管理，为请求调度到合适的容器的负载均衡，高峰访问事的容器集群的自动扩容管理等等对容器的各种层面的管理
 针对对容器这么多管理的需要，google就研究了一个专门对容器进行各种管理的k8s系统。 目前都一致认为是未来分布式集群的架构方向，而且现在很多公司已经把k8s应用到生产环境。 
 
-
-
-
-
-在虚拟网络可以执行的命令bash打开交互窗口， 对网卡操作的ip link，
-对地址操作的ip addr.  可以说， 一切在本机环境里操作的网络命令都可以在
-虚拟网络环境里操作。 命令格式中的， 前面的ip netns exec ns名是不变的，
-表示在虚拟网络环境里执行， 平常的命令没有这些，就是在本机环境里执行。 
-虚拟网络环境和本机环境的命令的区别就看前面有没有ip netns exec ns名
-在虚拟网路环境的bash窗口里可以使用本机的一切命令
-
-
-打开虚拟网络环境mytest的bash窗口
-user1@ubuntu:~$ sudo ip netns exec mytest bash
-root@ubuntu:~# ls
-a  core     Documents  examples.desktop  Pictures  snap       Videos
-b  Desktop  Downloads  Music             Public    Templates
-root@ubuntu:~# ifconfig
-无任何显示， 因为没有网卡
-root@ubuntu:~# exit  // 退出mytest 的bash
-
-启动回环设备：
-user1@ubuntu:~$ sudo ip netns exec mytest ip link set dev lo up
-再进到mytest的bash看
-user1@ubuntu:~$ sudo ip netns exec mytest bash
-root@ubuntu:~# ifconfig
-lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
-        inet 127.0.0.1  netmask 255.0.0.0
-        inet6 ::1  prefixlen 128  scopeid 0x10<host>
-        loop  txqueuelen 1000  (Local Loopback)
-        RX packets 0  bytes 0 (0.0 B)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 0  bytes 0 (0.0 B)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-以上是sudo ip netns exec mytest ip link set dev lo up建立回环设备的结果
- 
-
-
-
-
-
-
-
+一般习惯都是在宿主机操作在虚拟网络环境， 这样可以编写shell脚本。
+操作虚拟网络环境都有这样的前缀
+$ ip netns exec 虚拟网络环境的ns名 
+后面的命令和宿主机是一样的，比如
+$ ip netns exec ns1 ifconfig
+可以看到启动的网卡，启动的网卡才有ip地址。没有启动的网卡，不会被ifconfig看到
