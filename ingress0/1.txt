@@ -1,0 +1,51 @@
+master@etcd0:~/k8s_yaml/ingress$ kubectl get svc -o wide
+NAME          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                         AGE     SELECTOR
+kubernetes    ClusterIP   10.96.0.1        <none>        443/TCP                         25m     <none>
+myapp-svc     ClusterIP   10.100.221.227   <none>        80/TCP                          17m     app=myapp,env=test
+service-app   ClusterIP   10.100.56.155    <none>        80/TCP                          12m     app=deployment-myapp-label
+svc-1-name    NodePort    10.100.253.102   <none>        8081:30001/TCP,8085:32191/TCP   4m47s   name=rc-tomcat-template-label
+master@etcd0:~/k8s_yaml/ingress$ curl http://10.100.253.102:8081
+
+master@etcd0:~/k8s_yaml/ingress$ curl http://192.168.0.204:30001
+
+master@etcd0:~/k8s_yaml/ingress$ kubectl get ingress -o wide
+NAME        HOSTS   ADDRESS   PORTS   AGE
+ingress-1   *                 80      4m49s
+
+master@etcd0:~/k8s_yaml/ingress$ kubectl apply -f mandotary.yaml
+namespace/ingress-nginx created
+configmap/nginx-configuration created
+configmap/tcp-services created
+configmap/udp-services created
+serviceaccount/nginx-ingress-serviceaccount created
+clusterrole.rbac.authorization.k8s.io/nginx-ingress-clusterrole created
+role.rbac.authorization.k8s.io/nginx-ingress-role created
+rolebinding.rbac.authorization.k8s.io/nginx-ingress-role-nisa-binding created
+clusterrolebinding.rbac.authorization.k8s.io/nginx-ingress-clusterrole-nisa-binding created
+deployment.apps/nginx-ingress-controller created
+master@etcd0:~/k8s_yaml/ingress$ kubectl get po -ns=kube-system
+No resources found.
+master@etcd0:~/k8s_yaml/ingress$ kubectl get po --namespace=kube-system
+NAME                            READY   STATUS    RESTARTS   AGE
+calico-node-bggmg               2/2     Running   1          33m
+calico-node-jq7p8               2/2     Running   0          31m
+coredns-bccdc95cf-jtzx4         1/1     Running   0          36m
+coredns-bccdc95cf-l95l7         1/1     Running   1          36m
+etcd-etcd0                      1/1     Running   0          36m
+kube-apiserver-etcd0            1/1     Running   0          36m
+kube-controller-manager-etcd0   1/1     Running   2          36m
+kube-proxy-2f5nc                1/1     Running   0          36m
+kube-proxy-2fwc6                1/1     Running   0          31m
+kube-scheduler-etcd0            1/1     Running   2          36m
+master@etcd0:~/k8s_yaml/ingress$ kubectl get po --namespace=kube-system
+NAME                            READY   STATUS    RESTARTS   AGE
+calico-node-bggmg               2/2     Running   1          33m
+calico-node-jq7p8               2/2     Running   0          31m
+coredns-bccdc95cf-jtzx4         1/1     Running   0          36m
+coredns-bccdc95cf-l95l7         1/1     Running   1          36m
+etcd-etcd0                      1/1     Running   0          36m
+kube-apiserver-etcd0            1/1     Running   0          36m
+kube-controller-manager-etcd0   1/1     Running   2          36m
+kube-proxy-2f5nc                1/1     Running   0          36m
+kube-proxy-2fwc6                1/1     Running   0          31m
+kube-scheduler-etcd0            1/1     Running   2          36m

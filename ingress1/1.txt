@@ -1,4 +1,4 @@
-master@ubuntu:~/k8s_yaml/ingress1$ kubectl delete deployment deployment-nginx-v8
+﻿master@ubuntu:~/k8s_yaml/ingress1$ kubectl delete deployment deployment-nginx-v8
 deployment.extensions "deployment-nginx-v8" deleted
 master@ubuntu:~/k8s_yaml/ingress1$ kubectl get po
 NAME                                   READY   STATUS        RESTARTS   AGE
@@ -90,4 +90,12 @@ Events:
   ----    ------  ----  ----                      -------
   Normal  CREATE  36m   nginx-ingress-controller  Ingress default/ingress-myapp
 
-  
+
+  serviceAccountName: nginx-ingress-serviceaccount
+      hostNetwork: true
+导致：
+master@etcd0:~/k8s_yaml$ kubectl get pod -n ingress-nginx -o wide
+NAME                                        READY   STATUS    RESTARTS   AGE   IP              NODE         NOMINATED NODE   READINESS GATES
+nginx-ingress-controller-5cfc7fb776-dnlc8   1/1     Running   0          40s   192.168.0.205   ubuntunode   <none>           <none>
+
+
