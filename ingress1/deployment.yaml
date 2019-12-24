@@ -8,19 +8,20 @@ metadata:
  
 spec:
  
-  replicas: 2
+  replicas: 1
  
   template:
  
     metadata:
  
       labels:
- 
         app: web
  
     spec:
  
       containers:
+        - labels:
+          app: ingress-nginx
  
         - name: deployment-web-container 
  
@@ -28,4 +29,4 @@ spec:
  
           ports:
  
-            - containerPort: 8081
+            - containerPort: 80 

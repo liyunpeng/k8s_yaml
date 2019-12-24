@@ -1,0 +1,27 @@
+master@ubuntu:~/k8s_yaml/ingress1$ kubectl delete deployment deployment-nginx-v8
+deployment.extensions "deployment-nginx-v8" deleted
+master@ubuntu:~/k8s_yaml/ingress1$ kubectl get po
+NAME                                   READY   STATUS        RESTARTS   AGE
+deployment-nginx-v8-7489dbcdc4-579dx   0/1     Terminating   1          22h
+myapp-test-7cdcb494b6-42dtk            1/1     Running       2          3d22h
+myapp-test-7cdcb494b6-zdw8g            1/1     Running       2          3d22h
+master@ubuntu:~/k8s_yaml/ingress1$ kubectl get po
+NAME                                   READY   STATUS        RESTARTS   AGE
+deployment-nginx-v8-7489dbcdc4-579dx   0/1     Terminating   1          22h
+myapp-test-7cdcb494b6-42dtk            1/1     Running       2          3d22h
+myapp-test-7cdcb494b6-zdw8g            1/1     Running       2          3d22h
+master@ubuntu:~/k8s_yaml/ingress1$ kubectl get po
+NAME                                   READY   STATUS        RESTARTS   AGE
+deployment-nginx-v8-7489dbcdc4-579dx   0/1     Terminating   1          22h
+myapp-test-7cdcb494b6-42dtk            1/1     Running       2          3d22h
+myapp-test-7cdcb494b6-zdw8g            1/1     Running       2          3d22h
+master@ubuntu:~/k8s_yaml/ingress1$ kubectl get po
+NAME                                   READY   STATUS        RESTARTS   AGE
+deployment-nginx-v8-7489dbcdc4-579dx   0/1     Terminating   1          22h
+myapp-test-7cdcb494b6-42dtk            1/1     Running       2          3d22h
+myapp-test-7cdcb494b6-zdw8g            1/1     Running       2          3d22h
+master@ubuntu:~/k8s_yaml/ingress1$ kubectl get po
+NAME                          READY   STATUS    RESTARTS   AGE
+myapp-test-7cdcb494b6-42dtk   1/1     Running   2          3d22h
+myapp-test-7cdcb494b6-zdw8g   1/1     Running   2          3d22h
+删除deployment, 其pod也跟着删除
