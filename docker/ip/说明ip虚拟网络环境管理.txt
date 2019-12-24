@@ -1,0 +1,84 @@
+为了叙述方便， namespace简称ns,  ip的ns就是虚拟网络环境
+ip命令可以操作的有链路层，虚拟网络环境, ip地址
+响应的ip命令有三类选项：
+操作链路层的用link选项，操作虚拟网络环境的nets选项, 操作ip地址的link选项
+=============================================================================
+先说nets选项
+nets选项可以创建虚拟网路环境,  如：
+$ ip netns add ns1
+这样就创建了虚拟网络环境ns1
+
+进入到虚拟网络环境shell交互： 
+$ sudo ip netns exec ns1 bash
+root@lfgphicprd19011:/# ls
+bin  boot  dev  etc  home  initrd.img  lib  lib32  lib64  libx32  lost+found  media  mnt  opt  proc  root  run  sbin  snap  srv  sys  tmp  usr  var  vmlinuz
+root@lfgphicprd19011:/# ifconfig
+root@lfgphicprd19011:/# ip a
+1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN group default qlen 1
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+可见刚开始创建的虚拟网络环境并没有自己的网卡。 
+================================================================================
+link选项：
+为了给虚拟网络环境添加网卡， 需要link选项操作链路层以创建网卡，然后link选项把这个网卡添加到虚拟网络环境。
+网卡设备是链路层的东西，link选项可以创建虚拟网卡， 一般一次性创建两个互联的网卡，
+如创建veth peer两个互联的网卡设备 veth-a, veth-b：
+$ ip link add veth-a type veth peer name veth-b   
+默认两个互联的网卡，都在本机中，本机也是一个网络环境。
+两个网络环境，不管是虚拟的还是物理的， 都必须都拥有网卡，然后通过网卡通讯。
+网卡并不一定是物理上的网卡，是软件上创建出来的网卡。
+我们需要把veth-a 网卡需要添加到虚拟网络环境, veth-b网卡维持在本机中。
+这样虚拟网络环境和本机才有了链路层通讯的基础。
+
+现在把创建好的网卡veth-a添加到网络虚拟环境ns1里
+$ ip link set veth-a nets ns1
+链路层需要操作的就是这两个动作，创建一对互联的网卡，把网卡添加到网络环境中
+===============================================================================
+好了再回到nets选项：
+link选项已经把网卡veth-a 添加到了虚拟网络环境ns1，
+现在就要在虚拟网络环境ns1启动添加好的网卡
+$ ip netns exec ns ip link set dev veth-a up
+
+在虚拟网络环境中为网卡分配ip地址
+$ip netns exec ns ip addr add 10.1.2.3 dev veth-a
+小总结： 在虚拟网络可以执行的命令bash打开交互窗口， 对网卡操作的ip link，
+对地址操作的ip addr.  可以说， 一切在本机环境里操作的网络命令都可以在
+虚拟网络环境里操作。 命令格式中的， 前面的ip netns exec ns名是不变的，
+表示在虚拟网络环境里执行， 平常的命令没有这些，就是在本机环境里执行。 
+虚拟网络环境和本机环境的命令的区别就看前面有没有ip netns exec ns名
+在虚拟网路环境的bash窗口里可以使用本机的一切命令
+
+
+
+
+
+打开虚拟网络环境mytest的bash窗口
+user1@ubuntu:~$ sudo ip netns exec mytest bash
+root@ubuntu:~# ls
+a  core     Documents  examples.desktop  Pictures  snap       Videos
+b  Desktop  Downloads  Music             Public    Templates
+root@ubuntu:~# ifconfig
+无任何显示， 因为没有网卡
+root@ubuntu:~# exit  // 退出mytest 的bash
+
+启动回环设备：
+user1@ubuntu:~$ sudo ip netns exec mytest ip link set dev lo up
+再进到mytest的bash看
+user1@ubuntu:~$ sudo ip netns exec mytest bash
+root@ubuntu:~# ifconfig
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+以上是sudo ip netns exec mytest ip link set dev lo up建立回环设备的结果
+ 
+
+
+
+
+
+
+
