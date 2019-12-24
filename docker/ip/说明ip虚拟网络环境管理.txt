@@ -13,6 +13,8 @@ $ sudo ip netns exec ns1 bash
 root@lfgphicprd19011:/# ls
 bin  boot  dev  etc  home  initrd.img  lib  lib32  lib64  libx32  lost+found  media  mnt  opt  proc  root  run  sbin  snap  srv  sys  tmp  usr  var  vmlinuz
 root@lfgphicprd19011:/# ifconfig
+ifconfig显示为空， 说明当前的网络环境没有网卡
+
 root@lfgphicprd19011:/# ip a
 1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN group default qlen 1
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
@@ -35,20 +37,36 @@ $ ip link set veth-a nets ns1
 ===============================================================================
 好了再回到nets选项：
 link选项已经把网卡veth-a 添加到了虚拟网络环境ns1，
-现在就要在虚拟网络环境ns1启动添加好的网卡
-$ ip netns exec ns ip link set dev veth-a up
+现在就要在虚拟网络环境ns1启动已添加到本网络环境的网卡veth-a：
+$ ip netns exec ns1 ip link set dev veth-a up
 
-在虚拟网络环境中为网卡分配ip地址
-$ip netns exec ns ip addr add 10.1.2.3 dev veth-a
-小总结： 在虚拟网络可以执行的命令bash打开交互窗口， 对网卡操作的ip link，
+网卡启动了， 就可以为这个网卡分配ip地址. 分配地址需要用addr选项。
+==========================================================================
+addr选项：
+addr 选项最主要的作用是为网卡设置地址， 
+如为网卡ens设置ip地址为192.168.0.123：
+$ ip addr add 192.168.0.123 dev ens33
+这是对本机网络环境的设置，如果需要在指定的网络环境设置，需要在前面加上ip netns exec 虚拟网络环境的ns名字
+所以对虚拟网络环境ns1的网卡veth-a设置地址的命令就是：
+$ ip netns exec ns ip addr add 192.168.0.211 dev veth-a
+
+ip netns 创建的虚拟网络环境 与本地的网路环境， 只是网络环境的隔离， 文件系统和进程都没有隔离 
+文件系统不隔离， 意味着看到的文件系统是和宿主机完全相同的， 而且宿主机的所有命令也是在虚拟网络环境同样适用, 如：
+$ sudo ip netns exec ns1 bash
+root@lfgphicprd19011:~/# cd
+root@lfgphicprd19011:~# ls /home
+master  // 宿主机的用户目录
+进程不隔离， 意味着宿主机的所有进程在虚拟网络环境同样可见， 如
+root@lfgphicprd19011:~/# top 
+看到的进程和宿主机是相同的
+
+
+在虚拟网络可以执行的命令bash打开交互窗口， 对网卡操作的ip link，
 对地址操作的ip addr.  可以说， 一切在本机环境里操作的网络命令都可以在
 虚拟网络环境里操作。 命令格式中的， 前面的ip netns exec ns名是不变的，
 表示在虚拟网络环境里执行， 平常的命令没有这些，就是在本机环境里执行。 
 虚拟网络环境和本机环境的命令的区别就看前面有没有ip netns exec ns名
 在虚拟网路环境的bash窗口里可以使用本机的一切命令
-
-
-
 
 
 打开虚拟网络环境mytest的bash窗口
