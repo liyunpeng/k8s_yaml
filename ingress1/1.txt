@@ -25,3 +25,69 @@ NAME                          READY   STATUS    RESTARTS   AGE
 myapp-test-7cdcb494b6-42dtk   1/1     Running   2          3d22h
 myapp-test-7cdcb494b6-zdw8g   1/1     Running   2          3d22h
 删除deployment, 其pod也跟着删除
+
+master@ubuntu:~/k8s_yaml/ingress1$  kubectl get pod -n ingress-nginx -o wide
+NAME                                        READY   STATUS    RESTARTS   AGE     IP             NODE     NOMINATED NODE   READINESS GATES
+nginx-ingress-controller-799dbf6fbd-ngrq4   1/1     Running   2          3d22h   192.169.0.37   ubuntu   <none>           <none>
+master@ubuntu:~/k8s_yaml/ingress1$ curl 192.169.0.37
+<html>
+<head><title>404 Not Found</title></head>
+<body>
+<center><h1>404 Not Found</h1></center>
+<hr><center>openresty/1.15.8.2</center>
+</body>
+</html>
+
+
+master@ubuntu:~/k8s_yaml$ kubectl get po -n=spring-boot-demo  -o wide
+NAME                                       READY   STATUS    RESTARTS   AGE   IP             NODE     NOMINATED NODE   READINESS GATES
+nginx-ingress-controller-bf84cc994-6x7p7   1/1     Running   0          51m   192.169.0.44   ubuntu   <none>           <none>
+master@ubuntu:~/k8s_yaml$ curl 192.169.0.44
+<html>
+<head><title>404 Not Found</title></head>
+<body>
+<center><h1>404 Not Found</h1></center>
+<hr><center>nginx/1.15.9</center>
+</body>
+</html>
+master@ubuntu:~/k8s_yaml$ curl 192.169.0.44:30001
+curl: (7) Failed to connect to 192.169.0.44 port 30001: Connection refused
+master@ubuntu:~/k8s_yaml$ curl 192.169.0.44:30001/spring-boot-demo
+curl: (7) Failed to connect to 192.169.0.44 port 30001: Connection refused
+
+
+master@ubuntu:~/k8s_yaml$ curl -k https://192.169.0.44:30001/spring-boot-demo
+curl: (7) Failed to connect to 192.169.0.44 port 30001: Connection refused
+
+
+master@ubuntu:~/k8s_yaml$ kubectl get po -o wide
+NAME                          READY   STATUS    RESTARTS   AGE     IP             NODE     NOMINATED NODE   READINESS GATES
+myapp-test-7cdcb494b6-42dtk   1/1     Running   2          3d22h   192.169.0.38   ubuntu   <none>           <none>
+myapp-test-7cdcb494b6-zdw8g   1/1     Running   2          3d22h   192.169.0.42   ubuntu   <none>           <none>
+rc-nginx-55wfz                1/1     Running   0          24m     192.169.0.45   ubuntu   <none>           <none>
+rc-nginx-j8mnq                1/1     Running   0          24m     192.169.0.46   ubuntu   <none>           <none>
+master@ubuntu:~/k8s_yaml$ curl 192.169.0.45
+<h1>Hello, Docker!</h1>
+
+
+
+master@ubuntu:~/k8s_yaml$ kubectl describe ingress ingress-myapp
+Name:             ingress-myapp
+Namespace:        default
+Address:
+Default backend:  default-http-backend:80 (<none>)
+Rules:
+  Host         Path  Backends
+  ----         ----  --------
+  www.shp.com
+                  myapp-svc:80 (192.169.0.38:80,192.169.0.42:80)
+Annotations:
+  kubectl.kubernetes.io/last-applied-configuration:  {"apiVersion":"extensions/v1beta1","kind":"Ingress","metadata":{"annotations":{"kubernetes.io/ingress.class":"nginx"},"name":"ingress-myapp","namespace":"default"},"spec":{"rules":[{"host":"www.shp.com","http":{"paths":[{"backend":{"serviceName":"myapp-svc","servicePort":80},"path":null}]}}]}}
+
+  kubernetes.io/ingress.class:  nginx
+Events:
+  Type    Reason  Age   From                      Message
+  ----    ------  ----  ----                      -------
+  Normal  CREATE  36m   nginx-ingress-controller  Ingress default/ingress-myapp
+
+  
