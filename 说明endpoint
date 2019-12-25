@@ -1,0 +1,50 @@
+service 本身是不提供服务的， 他本身是个代理， 完成服务的是后端的pod, 或其他的对象。 
+servide 的定义里，必须写好selector， 匹配出后端真正服务的对象。 
+如果争取的匹配到了， endpoint controller， 就会为这个service创建一个endpoint， 
+servcie并不是直接连接到后端服务的对象， 而是用这个endpoirnt去连接真正实现服务的对象。 
+endpoint 描述了后端服务对象的ip地址和端口。 
+service 的后端服务对象可以是集群内部的，也可以是集群外部的， 
+如果后端服务的对象是pod, pod肯定8ks集群内部的， 那么endpoint conttroller会自动创建出endpoint. 
+如果后端服务对象是集群外部的，  那么就需要自己手动创建一个endpoint对象。 
+举个例子， mysql因为io操作频繁的缘故， 一般不放在k8s集群， 而是独立于集群的单独服务，
+ 这时就需要用手动创建endpoint,  描述外部服务的mysql的ip和端口。 
+$ cat mysql-endpoints.yaml
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: mysql-production
+subsets:
+  - addresses:
+      - ip: 192.168.1.25
+    ports:
+      - port: 3306
+
+使用这个endporint的service， 必须和endpoint的名字相同。 而且和endpoint的端口也要相同。 
+$ cat mysql-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-production
+spec:
+  ports:
+    - port: 3306
+
+这样等于把外部服务mysl纳入到了k8s集群内部， 
+kubectl describe svc mysql-production
+Name:           mysql-production
+Namespace:      default
+Labels:         <none>
+Annotations:        <none>
+Selector:       <none>
+Type:           ClusterIP
+IP:         10.254.218.165
+Port:           <unset> 3306/TCP
+Endpoints:      192.168.1.25:3306
+Session Affinity:   None
+Events:         <none>
+
+mysql也是运行在容器中， 只不过是k8s集群外部的容器， 经过endpoint纳入到k8s集群管理， 虽然容器不属于集群，但可以被集群管理。 
+用kubectl exec -it 可以进入到这个容器的shell交互;
+
+$ kubectl exec -it mysql-client-j3fr3 bash
+mysql>
