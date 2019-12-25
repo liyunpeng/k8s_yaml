@@ -1,0 +1,62 @@
+ingress 策略定义文件里， kind是ingress,  定义了http的路由转发规则， 就是对不同的url路径转发到不同的后端服务。 以下是完整的策略定义问价
+$ cat  ingress-policy.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-myapp
+  namespace: default
+  annotations: 
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: www.abcd.com
+    http:
+      paths:
+        - path: /demo
+          backend:
+            serviceName: myapp-svc
+            servicePort: 80
+        - path: /abc
+          backend:
+            serviceName: myapp-svc
+            servicePort: 80
+$ kubectl apply -f  ingress-policy.yaml
+apply 后可以看到： 
+$ kubectl get ingress -o wide
+NAME        HOSTS   ADDRESS   PORTS   AGE
+ingress-myapp   *                 80      4m49s
+
+ingress策略文件的定义清晰易懂， 
+所有的路径和后端服务的定义都要放在描述项：
+    http:
+      paths:
+里面.
+立方放着若干结构一致的组， 每个组包含一个url路径对应的一个后端服务，如;
+        - path: /demo
+          backend:
+            serviceName: myapp-svc
+            servicePort: 80
+路径是相对url路径, 是客户端用的url路径， 这里对应客户端的访问是 http://www.abcd.com/demo
+后端服务由banckend字段描述。 描述内容包括服务名serviceName和端口servicePort
+服务名是kind为Service服务的名字， 如这里服务名为 myapp-svc， 对应的就有一个service.yaml定义文件
+kind: Service
+metadata:
+  name: myapp-svc
+通过命令可以看到这个服务：
+$ kubectl get svc -o wide
+NAME          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                         AGE     SELECTOR
+myapp-svc     ClusterIP   10.100.221.227   <none>        80/TCP                          17m     app=myapp,env=test
+clusterIp 是pod间通讯用的，也是pod所在的宿主机能访问的ip, 所以在k8s集群里的任何一个节点主机，都可以用此ip直接访问到这个服务， 即：
+$ curl 10.100.221.227
+
+host: 指定了url里的域名， 这个域名需要在/etc/resove.conf里静态指定， 域名对应应该是ingress控制的ip. 这里为
+$  kubectl get pod -n ingress-nginx -o wide
+NAME                                        READY   STATUS    RESTARTS   AGE     IP             NODE     NOMINATED NODE   READINESS GATES
+nginx-ingress-controller-799dbf6fbd-ngrq4   1/1     Running   2          3d22h   192.169.0.37   ubuntu   <none>           <none>
+这里ingress控制的ip为192.169.0.37， 所以/etc/resolve.conf添加一行域名和ip：
+www.abcd.com 192.169.0.37
+保存后， 域名解析立即生效。 即可访问
+$ curl http://www.abcd.com/demo
+期望应该是和直接访问后端服务一样的效果，但是返回404页面。
+4xx的错误一般是客户端错误， 这说明ingress服务起来了， 如果没有起来， 则会显示connection refused错误。 
+原因应该ingress服务没找到后端服务， 可能是没有权限访问后端服务。 待后续
