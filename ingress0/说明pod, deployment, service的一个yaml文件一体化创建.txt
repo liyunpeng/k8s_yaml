@@ -1,0 +1,48 @@
+创建pod的方式有三种， 
+1. 单独的pod yaml定义文件， 
+2. rc方式的, 指定副本个数的创建方式，  rc会维护副本， 当某个pod出现故障了， 会启动新的副本维护住指定的副本个数。 
+3. deployment方式, 也是指定部分个数的创建， deployment有rc的全部功能， 还有版本滚动升级和回滚功能， deployment会创建replicationSet, 简称rs
+rs创建和维护pod副本， rs是rc的改进， rs比rc有更好的selector选择功能， rs可以选择出多个不同标签的pod,  而rc只能选择出一个标签的pod.  官方建议用deployment创建pod。 
+ 第三种方式是推荐使用的，所以学习第三种
+现在来看下pod, deployment, service的一体化创建的yaml文件：
+$ cat pod-deployment-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-svc
+  namespace: default
+spec:
+  selector:   
+    # service去匹配后端的pod，需要和depoyment里的template.matadata里的标签匹配，
+    # template.matadata里的标签才是pod的标签。
+    app: myapp
+    env: test
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment  
+metadata: 
+  name: myapp-test
+spec:
+  replicas: 2
+  selector:   # 要定义好selector, 代表自己管理的pod副本集合， 所有有这个标签的pod都被自己管理。 
+    matchLabels:   
+      app: myapp
+      env: test
+  template: 
+    metadata:  
+      labels:  
+      # 这个位置的标签是pod的标签， containers项可以包含多个容器的定义
+      # 这些容器都属于该pod
+        app: myapp 
+        env: test
+    spec:
+      containers:
+      - name: myapp
+        image: nginx:1.15-alpine 
+        ports:
+        - name: httpd
+          containerPort: 80
