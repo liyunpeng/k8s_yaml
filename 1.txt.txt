@@ -1,0 +1,299 @@
+ubuntu1@docker-registry:~/bin/shell/k8s$ kubectl logs pod/calico-node-4vxcd  -n=kube-system
+Error from server (BadRequest): a container name must be specified for pod calico-node-4vxcd, choose one of: [calico-node install-cni]
+ubuntu1@docker-registry:~/bin/shell/k8s$ kubectl logs calico-node-4vxcd  -n=kube-system
+Error from server (BadRequest): a container name must be specified for pod calico-node-4vxcd, choose one of: [calico-node install-cni]
+ubuntu1@docker-registry:~/bin/shell/k8s$ kubectl logs pod/calico-node-4vxcd calico-node  -n=kube-system
+Error from server (BadRequest): container "calico-node" in pod "calico-node-4vxcd" is waiting to start: trying and failing to pull image
+ubuntu1@docker-registry:~/bin/shell/k8s$ kubectl logs calico-node  -n=kube-system
+Error from server (NotFound): pods "calico-node" not found
+ubuntu1@docker-registry:~/bin/shell/k8s$ kubectl logs pod/calico-node-4vxcd -c calico-node  -n=kube-system
+Error from server (BadRequest): container "calico-node" in pod "calico-node-4vxcd" is waiting to start: trying and failing to pull image
+ubuntu1@docker-registry:~/bin/shell/k8s$ kubectl logs -f calico-node-4vxcd -c calico-node  -n=kube-system
+Error from server (BadRequest): container "calico-node" in pod "calico-node-4vxcd" is waiting to start: trying and failing to pull image
+ubuntu1@docker-registry:~/bin/shell/k8s$ kubectl logs po -n=kube-system
+
+
+ubuntu1@docker-registry:~/bin/shell/k8s$ kubectl get po -n=kube-system
+NAME                             READY   STATUS              RESTARTS   AGE
+calico-node-4vxcd                0/2     ContainerCreating   0          14s
+
+
+ubuntu1@docker-registry:~/bin/shell/k8s$ kubectl get po -n=kube-system
+NAME                                      READY   STATUS         RESTARTS   AGE
+calico-node-4vxcd                         0/2     ErrImagePull   0          4m24s
+
+ubuntu1@docker-registry:~/bin/shell/k8s$ kubectl get po -n=kube-system
+NAME                                      READY   STATUS             RESTARTS   AGE
+calico-node-4vxcd                         0/2     ImagePullBackOff   0          6m10s
+
+
+
+================================
+root@docker-app:/var/lib/docker# ll
+total 68
+drwx--x--x 15 root root  4096 Dec 26 20:13 ./
+drwxr-xr-x 71 root root  4096 Dec 27 22:34 ../
+drwx------  2 root root  4096 Dec 22 16:31 builder/
+drwx------  4 root root  4096 Dec 22 16:31 buildkit/
+drwx------  3 root root  4096 Dec 22 16:31 containerd/
+drwx------ 28 root root  4096 Dec 27 22:34 containers/
+drwx------  3 root root  4096 Dec 22 16:31 image/
+drwxr-x---  3 root root  4096 Dec 22 16:31 network/
+drwx------ 89 root root 12288 Dec 27 22:34 overlay2/
+drwx------  4 root root  4096 Dec 22 16:31 plugins/
+drwx------  2 root root  4096 Dec 26 20:13 runtimes/
+drwx------  2 root root  4096 Dec 22 16:31 swarm/
+drwx------  2 root root  4096 Dec 27 22:34 tmp/
+drwx------  2 root root  4096 Dec 22 16:31 trust/
+drwx------  2 root root  4096 Dec 22 16:31 volumes/
+root@docker-app:/var/lib/docker# ll containers/
+total 112
+drwx------ 28 root root 4096 Dec 27 22:34 ./
+drwx--x--x 15 root root 4096 Dec 26 20:13 ../
+drwx------  4 root root 4096 Dec 26 20:13 0c77ea293cf3273a43fa50733187b954c16517aeb8062c6a988465611cf1b19d/
+
+
+
+,"quay-mirror.qiniu.com/calico/cni":
+{"quay-mirror.qiniu.com/calico/cni:v3.3.2":"sha256:490d921fa49ccfe48506d6030751c471fba180af902fdae361a85af86eeb1555",
+"quay-mirror.qiniu.com/calico/cni@sha256:218209f4948d57ae227fb0fba3b597e99334cb39e2abb11555ec359dae177782":
+"sha256:490d921fa49ccfe48506d6030751c471fba180af902fdae361a85af86eeb1555"}
+
+ubuntu1@docker-registry:~/bin/shell/k8s$ sudo docker pull lijincheng1/calicocni:v3
+v3: Pulling from lijincheng1/calicocni
+4fe2ade4980c: Pull complete
+7f9ef7e5380c: Pull complete
+1bcdb1c702ef: Pull complete
+e60c1681ba2f: Pull complete
+Digest: sha256:335d4b5e4f420dbdc4a7c9204f380f7328faf6f1af9162545e77346168f0ceb2
+Status: Downloaded newer image for lijincheng1/calicocni:v3
+ubuntu1@docker-registry:~/bin/shell/k8s$ sudo docker pull lijincheng1/calicocni:v3^C
+ubuntu1@docker-registry:~/bin/shell/k8s$ sudo docker images
+[sudo] ubuntu1 µÄÃÜÂë£º
+REPOSITORY                                                        TAG                 IMAGE ID            CREATED             SIZE
+openzipkin/zipkin                                                 latest              12ee1ce53834        5 weeks ago         157MB
+registry.aliyuncs.com/google_containers/kube-apiserver            v1.15.2             34a53be6c9a7        4 months ago        207MB
+registry.aliyuncs.com/google_containers/kube-proxy                v1.15.2             167bbf6c9338        4 months ago        82.4MB
+registry.aliyuncs.com/google_containers/kube-scheduler            v1.15.2             88fa9cb27bd2        4 months ago        81.1MB
+registry.aliyuncs.com/google_containers/kube-controller-manager   v1.15.2             9f5df470155d        4 months ago        159MB
+registry                                                          latest              f32a97de94e1        9 months ago        25.8MB
+quay.io/coreos/flannel                                            v0.11.0-amd64       ff281650a721        11 months ago       52.6MB
+registry.aliyuncs.com/google_containers/coredns                   1.3.1               eb516548c180        11 months ago       40.3MB
+quay-mirror.qiniu.com/calico/node                                 v3.3.2              4e9be81e3a59        12 months ago       75.3MB
+lijincheng1/calicocni                                             v3                  490d921fa49c        12 months ago       75.4MB
+quay-mirror.qiniu.com/calico/cni                                  v3.3.2              490d921fa49c        12 months ago       75.4MB
+registry.aliyuncs.com/google_containers/etcd                      3.3.10              2c4adeb21b4f        13 months ago       258MB
+registry.aliyuncs.com/google_containers/pause                     3.1                 da86e6ba6ca1        2 years ago         742kB
+
+
+
+
+
+
+node1@docker-app:~/bin/shell/k8s$ kubectl get po -n=kube-system
+NAME                                 READY   STATUS    RESTARTS   AGE
+calico-node-5bnh9                    2/2     Running   0          21m
+coredns-bccdc95cf-mgd5z              1/1     Running   0          26m
+coredns-bccdc95cf-wrfvz              1/1     Running   0          26m
+etcd-docker-app                      1/1     Running   0          25m
+kube-apiserver-docker-app            1/1     Running   0          25m
+kube-controller-manager-docker-app   1/1     Running   0          25m
+kube-proxy-n6r8r                     1/1     Running   0          26m
+kube-scheduler-docker-app            1/1     Running   0          25m
+node1@docker-app:~/bin/shell/k8s$ kubectl describe pod calico-node-5bnh9  -n=kube-system
+Name:           calico-node-5bnh9
+Namespace:      kube-system
+Priority:       0
+Node:           docker-app/192.168.0.211
+Start Time:     Fri, 27 Dec 2019 22:19:48 +0800
+Labels:         controller-revision-hash=648f9857c4
+                k8s-app=calico-node
+                pod-template-generation=1
+Annotations:    scheduler.alpha.kubernetes.io/critical-pod:
+Status:         Running
+IP:             192.168.0.211
+Controlled By:  DaemonSet/calico-node
+Containers:
+  calico-node:
+    Container ID:   docker://19aba438c55640c1c1b1fefeb99c72f5154e593b73224aa5b2f7d75d15c05a1b
+    Image:          quay-mirror.qiniu.com/calico/node:v3.3.2
+    Image ID:       docker-pullable://lijincheng1/caliconode@sha256:4b3e3750deeb97cf6f68e5d021f60891a0562f7412efdb545599e6ea505eaf18
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Fri, 27 Dec 2019 22:34:05 +0800
+    Ready:          True
+    Restart Count:  0
+    Requests:
+      cpu:      250m
+    Liveness:   http-get http://localhost:9099/liveness delay=10s timeout=1s period=10s #success=1 #failure=6
+    Readiness:  exec [/bin/calico-node -bird-ready -felix-ready] delay=0s timeout=1s period=10s #success=1 #failure=3
+    Environment:
+      DATASTORE_TYPE:                     kubernetes
+      FELIX_TYPHAK8SSERVICENAME:          <set to the key 'typha_service_name' of config map 'calico-config'>  Optional: false
+      WAIT_FOR_DATASTORE:                 true
+      NODENAME:                            (v1:spec.nodeName)
+      CALICO_NETWORKING_BACKEND:          <set to the key 'calico_backend' of config map 'calico-config'>  Optional: false
+      CLUSTER_TYPE:                       k8s,bgp
+      IP:                                 autodetect
+      CALICO_IPV4POOL_IPIP:               Always
+      FELIX_IPINIPMTU:                    <set to the key 'veth_mtu' of config map 'calico-config'>  Optional: false
+      CALICO_IPV4POOL_CIDR:               192.168.0.0/16
+      CALICO_DISABLE_FILE_LOGGING:        true
+      FELIX_DEFAULTENDPOINTTOHOSTACTION:  ACCEPT
+      FELIX_IPV6SUPPORT:                  false
+      FELIX_LOGSEVERITYSCREEN:            info
+      FELIX_HEALTHENABLED:                true
+    Mounts:
+      /lib/modules from lib-modules (ro)
+      /run/xtables.lock from xtables-lock (rw)
+      /var/lib/calico from var-lib-calico (rw)
+      /var/run/calico from var-run-calico (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from calico-node-token-wk5lx (ro)
+  install-cni:
+    Container ID:  docker://ac508adba509251cd80d9c766b6e78bf600cb7973a69e3a3d67fb0cf2471177c
+    Image:         quay-mirror.qiniu.com/calico/cni:v3.3.2
+    Image ID:      docker-pullable://quay-mirror.qiniu.com/calico/cni@sha256:218209f4948d57ae227fb0fba3b597e99334cb39e2abb11555ec359dae177782
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /install-cni.sh
+    State:          Running
+      Started:      Fri, 27 Dec 2019 22:34:20 +0800
+    Ready:          True
+    Restart Count:  0
+    Environment:
+      CNI_CONF_NAME:         10-calico.conflist
+      KUBERNETES_NODE_NAME:   (v1:spec.nodeName)
+      CNI_NETWORK_CONFIG:    <set to the key 'cni_network_config' of config map 'calico-config'>  Optional: false
+      CNI_MTU:               <set to the key 'veth_mtu' of config map 'calico-config'>            Optional: false
+    Mounts:
+      /host/etc/cni/net.d from cni-net-dir (rw)
+      /host/opt/cni/bin from cni-bin-dir (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from calico-node-token-wk5lx (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             True
+  ContainersReady   True
+  PodScheduled      True
+Volumes:
+  lib-modules:
+    Type:          HostPath (bare host directory volume)
+    Path:          /lib/modules
+    HostPathType:
+  var-run-calico:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/run/calico
+    HostPathType:
+  var-lib-calico:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/lib/calico
+    HostPathType:
+  xtables-lock:
+    Type:          HostPath (bare host directory volume)
+    Path:          /run/xtables.lock
+    HostPathType:  FileOrCreate
+  cni-bin-dir:
+    Type:          HostPath (bare host directory volume)
+    Path:          /opt/cni/bin
+    HostPathType:
+  cni-net-dir:
+    Type:          HostPath (bare host directory volume)
+    Path:          /etc/cni/net.d
+    HostPathType:
+  calico-node-token-wk5lx:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  calico-node-token-wk5lx
+    Optional:    false
+QoS Class:       Burstable
+Node-Selectors:  beta.kubernetes.io/os=linux
+Tolerations:     :NoSchedule
+                 :NoExecute
+                 CriticalAddonsOnly
+                 node.kubernetes.io/disk-pressure:NoSchedule
+                 node.kubernetes.io/memory-pressure:NoSchedule
+                 node.kubernetes.io/network-unavailable:NoSchedule
+                 node.kubernetes.io/not-ready:NoExecute
+                 node.kubernetes.io/pid-pressure:NoSchedule
+                 node.kubernetes.io/unreachable:NoExecute
+                 node.kubernetes.io/unschedulable:NoSchedule
+Events:
+  Type     Reason     Age                 From                 Message
+  ----     ------     ----                ----                 -------
+  Normal   Scheduled  37m                 default-scheduler    Successfully assigned kube-system/calico-node-5bnh9 to docker-app
+  Normal   BackOff    36m                 kubelet, docker-app  Back-off pulling image "quay-mirror.qiniu.com/calico/cni:v3.3.2"
+  Normal   Pulling    36m (x3 over 37m)   kubelet, docker-app  Pulling image "quay-mirror.qiniu.com/calico/node:v3.3.2"
+  Warning  Failed     35m (x3 over 36m)   kubelet, docker-app  Failed to pull image "quay-mirror.qiniu.com/calico/node:v3.3.2": rpc error: code = Unknown desc = unknown blob
+  Normal   Pulling    35m (x3 over 36m)   kubelet, docker-app  Pulling image "quay-mirror.qiniu.com/calico/cni:v3.3.2"
+  Warning  Failed     35m (x3 over 36m)   kubelet, docker-app  Error: ErrImagePull
+  Warning  Failed     35m (x3 over 36m)   kubelet, docker-app  Failed to pull image "quay-mirror.qiniu.com/calico/cni:v3.3.2": rpc error: code = Unknown desc = unknown blob
+  Warning  Failed     35m (x3 over 36m)   kubelet, docker-app  Error: ErrImagePull
+  Warning  Failed     35m (x2 over 36m)   kubelet, docker-app  Error: ImagePullBackOff
+  Warning  Failed     32m (x14 over 36m)  kubelet, docker-app  Error: ImagePullBackOff
+  Normal   BackOff    26m (x34 over 36m)  kubelet, docker-app  Back-off pulling image "quay-mirror.qiniu.com/calico/node:v3.3.2"
+node1@docker-app:~/bin/shell/k8s$ kubectl get po -n=kube-system
+NAME                                 READY   STATUS    RESTARTS   AGE
+calico-node-5bnh9                    2/2     Running   0          37m
+coredns-bccdc95cf-mgd5z              1/1     Running   0          42m
+coredns-bccdc95cf-wrfvz              1/1     Running   0          42m
+etcd-docker-app                      1/1     Running   0          41m
+kube-apiserver-docker-app            1/1     Running   0          41m
+kube-controller-manager-docker-app   1/1     Running   0          41m
+kube-proxy-n6r8r                     1/1     Running   0          42m
+kube-scheduler-docker-app            1/1     Running   0          41m
+node1@docker-app:~/bin/shell/k8s$ kubectl get node
+NAME         STATUS   ROLES    AGE   VERSION
+docker-app   Ready    master   43m   v1.15.2
+node1@docker-app:~/bin/shell/k8s$ ubuntu1@docker-registry:~/bin/shell/k8s$ kubectl get po -n=kube-system
+kube-apiserver-docker-registry            1/1     Running        0          3m50s
+kube-controller-manager-docker-registry   1/1     Running        0          4m4s
+kube-proxy-l477z                          1/1     Running        0          4m24s
+kube-scheduler-docker-registry            1/1     Running        0          4m15s
+ubuntu1@docker-registry:~/bin/shell/k8s$ kubectl get po -n=kube-system
+NAME                                      READY   STATUS         RESTARTS   AGE
+calico-node-4vxcd                         0/2     ErrImagePull   0          4m27s
+coredns-bccdc95cf-nqdlk                   0/1     Pending        0          4m27s
+coredns-bccdc95cf-sj9fw                   0/1     Pending        0          4m27s
+etcd-docker-registry                      1/1     Running        0          4m16s
+kube-apiserver-docker-registry            1/1     Running        0          3m53s
+kube-controller-manager-docker-registry   1/1     Running        0          4m7s
+kube-proxy-l477z                          1/1     Running        0          4m27s
+kube-scheduler-docker-registry            1/1     Running        0          4m18s
+ubuntu1@docker-registry:~/bin/shell/k8s$ kubectl get po -n=kube-system
+NAME                                      READY   STATUS             RESTARTS   AGE
+calico-node-4vxcd                         0/2     ImagePullBackOff   0          5m27s
+coredns-bccdc95cf-nqdlk                   0/1     Pending            0          5m27s
+coredns-bccdc95cf-sj9fw                   0/1     Pending            0          5m27s
+etcd-docker-registry                      1/1     Running            0          5m16s
+kube-apiserver-docker-registry            1/1     Running            0          4m53s
+kube-controller-manager-docker-registry   1/1     Running            0          5m7s
+kube-proxy-l477z                          1/1     Running            0          5-bash: ubuntu1@docker-registry:~/bin/shell/k8s$: No such file or directory
+node1@docker-app:~/bin/shell/k8s$ NAME                             READY   STATUS              RESTARTS   AGE
+NAME: command not found
+node1@docker-app:~/bin/shell/k8s$ calico-node-4vxcd                0/2     ContainerCreating   0          14s
+calico-node-4vxcd: command not found
+node1@docker-app:~/bin/shell/k8s$ coredns-bccdc95cf-nqdlk          0/1     Pending             0          14s
+coredns-bccdc95cf-nqdlk: command not found
+node1@docker-app:~/bin/shell/k8s$ coredns-bccdc95cf-sj9fw          0/1     Pending             0          14s
+coredns-bccdc95cf-sj9fw: command not found
+node1@docker-app:~/bin/shell/k8s$ etcd-docker-registry             0/1     Pending             0          3s
+etcd-docker-registry: command not found
+node1@docker-app:~/bin/shell/k8s$ kube-proxy-l477z                 1/1     Running             0          14s
+   Pending            0          6m10s
+coredns-bccdc95cf-sj9fw              kube-proxy-l477z: command not found
+node1@docker-app:~/bin/shell/k8s$ kube-scheduler-docker-registry   0/1     Pending             0          5s
+     0/1     Pending            0          6m10s
+etcd-docker-registry      kube-scheduler-docker-registry: command not found
+node1@docker-app:~/bin/shell/k8s$ ubuntu1@docker-registry:~/bin/shell/k8s$ kubectl get po -n=kube-system
+-bash: ubuntu1@docker-registry:~/bin/shell/k8s$: No such file or directory
+node1@docker-app:~/bin/shell/k8s$ NAME                             READY   STATUS              RESTARTS   AGE
+NAME: command not found
+node1@docker-app:~/bin/shell/k8s$ calico-node-4vxcd                0/2     ContainerCreating   0          17s
+calico-node-4vxcd: command not found
+node1@docker-app:~/bin/shell/k8s$ coredns-bccdc95cf-nqdlk          0/1     Pending             0          17s
+         1/1     Running          coredns-bccdc95cf-nqdlk: command not found
+node1@docker-app:~/bin/shell/k8s$ coredns-bccdc95cf-sj9fw          0/1     Pending             0          17s
+coredns-bccdc95cf-sj9fw: command not found
+node1@docker-app:~/bin/shell/k8s$ etcd-docker-registry             1/1     Running            ^C
+node1@docker-app:~/bin/shell/k8s$ cd /var/lib/
