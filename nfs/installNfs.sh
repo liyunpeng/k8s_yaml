@@ -5,6 +5,7 @@ set -v
 sudo apt-get install nfs-kernel-server -y  # 安装 NFS服务器端
 sudo apt-get install nfs-common   -y      # 安装 NFS客户端
 
+# count 返回/etc/exports文件里包含指定字符串的行数，这个字符串是/nfsroot \*(rw,sync,no_root_squash)
 count=`grep -c "/nfsroot \*(rw,sync,no_root_squash)"  /etc/exports` 
 echo $count
 #if [ $count -eq '1' ]; then
