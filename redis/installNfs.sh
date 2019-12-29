@@ -2,23 +2,26 @@
 
 set -v
 
-sudo cat << EOF > /etc/exports
-/usr/local/k8s/redis/pv1 192.168.0.0/211(rw,sync,no_root_squash)
-/usr/local/k8s/redis/pv2 192.168.0.0/211(rw,sync,no_root_squash)
-/usr/local/k8s/redis/pv3 192.168.0.0/211(rw,sync,no_root_squash)
-/usr/local/k8s/redis/pv4 192.168.0.0/211(rw,sync,no_root_squash)
-/usr/local/k8s/redis/pv5 192.168.0.0/211(rw,sync,no_root_squash)
-/usr/local/k8s/redis/pv6 192.168.0.0/211(rw,sync,no_root_squash)
+sudo cat << EOF > /tmp/exports 
+/usr/local/k8s/redis/pv1 192.168.0.211(rw,sync,no_root_squash)
+/usr/local/k8s/redis/pv2 192.168.0.211(rw,sync,no_root_squash)
+/usr/local/k8s/redis/pv3 192.168.0.211(rw,sync,no_root_squash)
+/usr/local/k8s/redis/pv4 192.168.0.211(rw,sync,no_root_squash)
+/usr/local/k8s/redis/pv5 192.168.0.211(rw,sync,no_root_squash)
+/usr/local/k8s/redis/pv6 192.168.0.211(rw,sync,no_root_squash)
 EOF
+sudo cp  /tmp/exports /etc/exports
 
-sudo apt-get install nfs-utils -y
+sudo apt-get install nfs-kernel-server -y  # 安装 NFS服务器端
+sudo apt-get install nfs-common   -y      # 安装 NFS客户端
 sudo apt-get install rpcbind -y
 
-mkdir -p /usr/local/k8s/redis/pv{1..6}
+sudo mkdir -p /usr/local/k8s/redis/pv{1..6}
 
-systemctl restart rpcbind
-systemctl restart nfs
-systemctl enable nfs
+sudo systemctl restart rpcbind
+#sudo systemctl restart nfs
+#sudo systemctl enable nfs
 
+sudo /etc/init.d/nfs-kernel-server restart
 
-exportfs -v
+sudo exportfs -v
