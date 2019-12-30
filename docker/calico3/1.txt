@@ -1,0 +1,7 @@
+master@ubuntu:~/k8s_yaml/docker/calico3$ sudo docker build -t lijincheng1/calico/node:v3 .
+Sending build context to Docker daemon  2.048kB
+Step 1/1 : FROM quay-mirror.qiniu.com/calico/node:v3.3.2
+ ---> 4e9be81e3a59
+Successfully built 4e9be81e3a59
+Successfully tagged lijincheng1/calico/node:v3
+

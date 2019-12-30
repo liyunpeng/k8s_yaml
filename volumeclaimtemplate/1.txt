@@ -1,0 +1,541 @@
+Events:
+  Type     Reason                  Age                    From               Message
+  ----     ------                  ----                   ----               -------
+  Warning  FailedScheduling        4m31s                  default-scheduler  persistentvolumeclaim "db-mysql-0" is being deleted
+  Warning  FailedScheduling        2m40s (x4 over 4m30s)  default-scheduler  persistentvolumeclaim "db-mysql-0" not found
+  Warning  FailedScheduling        2m32s (x2 over 2m32s)  default-scheduler  pod has unbound immediate PersistentVolumeClaims
+  Normal   Scheduled               2m28s                  default-scheduler  Successfully assigned default/mysql-0 to ubuntu
+  Warning  FailedCreatePodSandBox  2m26s                  kubelet, ubuntu    Failed create pod sandbox: rpc error: code = Unknown desc = [failed to set up sandbox container "329139c05dfdd73afce352d1edd8ed44b206807522aed88dd227631d37c9e21a" network for pod "mysql-0": NetworkPlugin cni failed to set up pod "mysql-0_default" network: error getting ClusterInformation: connection is unauthorized: clusterinformations.crd.projectcalico.org "default" is forbidden: User "system:serviceaccount:kube-system:calico-node" cannot get resource "clusterinformations" in API group "crd.projectcalico.org" at the cluster scope, failed to clean up sandbox container "329139c05dfdd73afce352d1edd8ed44b206807522aed88dd227631d37c9e21a" network for pod "mysql-0": NetworkPlugin cni failed to teardown pod "mysql-0_default" network: error getting ClusterInformation: connection is unauthorized: clusterinformations.crd.projectcalico.org "default" is forbidden: User "system:serviceaccount:kube-system:calico-node" cannot get resource "clusterinformations" in API group "crd.projectcalico.org" at the cluster scope]
+  Normal   SandboxChanged          1s (x12 over 2m25s)    kubelet, ubuntu    Pod sandbox changed, it will be killed and re-created.
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get pvc
+NAME         STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+db-mysql-0   Bound    pv001    5Gi        RWX                           3m34s
+
+
+
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl apply -f mypv.yaml
+persistentvolume/pv001 created
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl apply -f pvc.yaml
+persistentvolumeclaim/db-mysql-0 created
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl apply -f stateful.yaml
+service/mysql-service created
+statefulset.apps/mysql created
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get po
+No resources found.
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get po
+No resources found.
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get node
+NAME     STATUS   ROLES    AGE    VERSION
+ubuntu   Ready    master   2m6s   v1.15.2
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get po
+No resources found.
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get pod
+No resources found.
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get pv
+NAME    CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                STORAGECLASS   REASON   AGE
+pv001   5Gi        RWX            Retain           Bound    default/db-mysql-0                           55s
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get pvc
+NAME         STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+db-mysql-0   Bound    pv001    5Gi        RWX                           53s
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get po
+No resources found.
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get service
+NAME            TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+kubernetes      ClusterIP   10.96.0.1    <none>        443/TCP   2m31s
+mysql-service   ClusterIP   None         <none>        80/TCP    61s
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get statefulsset
+error: the server doesn't have a resource type "statefulsset"
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get rs
+No resources found.
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl describe mysql-service
+error: the server doesn't have a resource type "mysql-service"
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl describe svc mysql-service
+Name:              mysql-service
+Namespace:         default
+Labels:            app=mysql
+Annotations:       kubectl.kubernetes.io/last-applied-configuration:
+                     {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"mysql"},"name":"mysql-service","namespace":"default"},"s...
+Selector:          app=mysql
+Type:              ClusterIP
+IP:                None
+Port:              my-port  80/TCP
+TargetPort:        80/TCP
+Endpoints:         <none>
+Session Affinity:  None
+Events:            <none>
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get pods
+No resources found.
+
+
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get StatefulSet
+NAME    READY   AGE
+mysql   0/2     4m7s
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get StatefulSet -o wide
+NAME    READY   AGE     CONTAINERS   IMAGES
+mysql   0/2     4m14s   mysqlpod     mysql:latest
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl describe  StatefulSet mysql
+Name:               mysql
+Namespace:          default
+CreationTimestamp:  Sun, 29 Dec 2019 23:26:39 -0800
+Selector:           app=mysql
+Labels:             app=mysql
+Annotations:        kubectl.kubernetes.io/last-applied-configuration:
+                      {"apiVersion":"apps/v1beta1","kind":"StatefulSet","metadata":{"annotations":{},"name":"mysql","namespace":"default"},"spec":{"replicas":2,...
+Replicas:           2 desired | 0 total
+Update Strategy:    OnDelete
+Pods Status:        0 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=mysql
+  Containers:
+   mysqlpod:
+    Image:        mysql:latest
+    Port:         80/TCP
+    Host Port:    0/TCP
+    Environment:  <none>
+    Mounts:
+      /var/lib/mysql from db (rw)
+  Volumes:  <none>
+Volume Claims:
+  Name:          db
+  StorageClass:
+  Labels:        <none>
+  Annotations:   <none>
+  Capacity:      1Gi
+  Access Modes:  [ReadWriteMany]
+Events:
+  Type     Reason        Age                    From                    Message
+  ----     ------        ----                   ----                    -------
+  Warning  FailedCreate  108s (x16 over 4m32s)  statefulset-controller  create Pod mysql-0 in StatefulSet mysql failed error: Pod "mysql-0" is invalid: spec.containers[0].imagePullPolicy: Unsupported value: "IfNotPresent`": supported values: "Always", "IfNotPresent", "Never"
+
+
+
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get po
+NAME      READY   STATUS             RESTARTS   AGE
+mysql-0   0/1     CrashLoopBackOff   1          10s
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl describe  po mysql-0
+Name:           mysql-0
+Namespace:      default
+Priority:       0
+Node:           ubuntu/192.168.0.140
+Start Time:     Sun, 29 Dec 2019 23:32:38 -0800
+Labels:         app=mysql
+                controller-revision-hash=mysql-948fbf5c7
+                statefulset.kubernetes.io/pod-name=mysql-0
+Annotations:    cni.projectcalico.org/podIP: 192.169.0.66/32
+Status:         Running
+IP:             192.169.0.66
+Controlled By:  StatefulSet/mysql
+Containers:
+  mysqlpod:
+    Container ID:   docker://73b0141e9c92811ab8503d7ecd29ce58125e96c9ed0ea418b69cdff07ceb1c89
+    Image:          mysql:latest
+    Image ID:       docker-pullable://mysql@sha256:c93ba1bafd65888947f5cd8bd45deb7b996885ec2a16c574c530c389335e9169
+    Port:           80/TCP
+    Host Port:      0/TCP
+    State:          Waiting
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Sun, 29 Dec 2019 23:32:56 -0800
+      Finished:     Sun, 29 Dec 2019 23:32:56 -0800
+    Ready:          False
+    Restart Count:  2
+    Environment:    <none>
+    Mounts:
+      /var/lib/mysql from db (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-lr875 (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             False
+  ContainersReady   False
+  PodScheduled      True
+Volumes:
+  db:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  db-mysql-0
+    ReadOnly:   false
+  default-token-lr875:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-lr875
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  30s                default-scheduler  Successfully assigned default/mysql-0 to ubuntu
+  Normal   Pulled     12s (x3 over 29s)  kubelet, ubuntu    Container image "mysql:latest" already present on machine
+  Normal   Created    12s (x3 over 29s)  kubelet, ubuntu    Created container mysqlpod
+  Normal   Started    12s (x3 over 29s)  kubelet, ubuntu    Started container mysqlpod
+  Warning  BackOff    0s (x4 over 27s)   kubelet, ubuntu    Back-off restarting failed container
+
+
+
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get po -o wide
+NAME      READY   STATUS    RESTARTS   AGE   IP             NODE     NOMINATED NODE   READINESS GATES
+mysql-0   0/1     Error     3          47s   192.169.0.69   ubuntu   <none>           <none>
+mysql-1   0/1     Pending   0          30s   <none>         <none>   <none>           <none>
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get po -o wide
+NAME      READY   STATUS    RESTARTS   AGE   IP             NODE     NOMINATED NODE   READINESS GATES
+mysql-0   0/1     Error     3          52s   192.169.0.69   ubuntu   <none>           <none>
+mysql-1   0/1     Pending   0          35s   <none>         <none>   <none>           <none>
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl get po -o wide
+NAME      READY   STATUS             RESTARTS   AGE   IP             NODE     NOMINATED NODE   READINESS GATES
+mysql-0   0/1     CrashLoopBackOff   3          59s   192.169.0.69   ubuntu   <none>           <none>
+mysql-1   0/1     Pending            0          42s   <none>         <none>   <none>           <none>
+
+
+
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl describe po mysql-0
+Name:           mysql-0
+Namespace:      default
+Priority:       0
+Node:           ubuntu/192.168.0.140
+Start Time:     Sun, 29 Dec 2019 23:37:36 -0800
+Labels:         app=mysql
+                controller-revision-hash=mysql-948fbf5c7
+                statefulset.kubernetes.io/pod-name=mysql-0
+Annotations:    cni.projectcalico.org/podIP: 192.169.0.69/32
+Status:         Running
+IP:             192.169.0.69
+Controlled By:  StatefulSet/mysql
+Containers:
+  mysqlpod:
+    Container ID:   docker://2073696491dd37373753003f0883d376e6ecf67ba30e34618f375e5122ccf0d0
+    Image:          mysql:latest
+    Image ID:       docker-pullable://mysql@sha256:c93ba1bafd65888947f5cd8bd45deb7b996885ec2a16c574c530c389335e9169
+    Port:           80/TCP
+    Host Port:      0/TCP
+    State:          Waiting
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Sun, 29 Dec 2019 23:38:19 -0800
+      Finished:     Sun, 29 Dec 2019 23:38:20 -0800
+    Ready:          False
+    Restart Count:  3
+    Environment:    <none>
+    Mounts:
+      /var/lib/mysql from db (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-dmxqj (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             False
+  ContainersReady   False
+  PodScheduled      True
+Volumes:
+  db:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  db-mysql-0
+    ReadOnly:   false
+  default-token-dmxqj:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-dmxqj
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  95s                default-scheduler  Successfully assigned default/mysql-0 to ubuntu
+  Normal   Pulled     52s (x4 over 93s)  kubelet, ubuntu    Container image "mysql:latest" already present on machine
+  Normal   Created    52s (x4 over 93s)  kubelet, ubuntu    Created container mysqlpod
+  Normal   Started    52s (x4 over 93s)  kubelet, ubuntu    Started container mysqlpod
+  Warning  BackOff    15s (x8 over 91s)  kubelet, ubuntu    Back-off restarting failed container
+
+
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ kubectl logs mysql-0
+2019-12-30 07:39:11+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.18-1debian9 started.
+2019-12-30 07:39:11+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2019-12-30 07:39:11+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.18-1debian9 started.
+2019-12-30 07:39:12+00:00 [ERROR] [Entrypoint]: Database is uninitialized and password option is not specified
+        You need to specify one of MYSQL_ROOT_PASSWORD, MYSQL_ALLOW_EMPTY_PASSWORD and MYSQL_RANDOM_ROOT_PASSWORD
+
+
+
+
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k get po
+NAME      READY   STATUS              RESTARTS   AGE
+mysql-0   0/1     ContainerCreating   0          23s
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k get po
+NAME      READY   STATUS              RESTARTS   AGE
+mysql-0   0/1     ContainerCreating   0          26s
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k get po
+NAME      READY   STATUS    RESTARTS   AGE
+mysql-0   1/1     Running   0          30s
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ vi stateful.yaml
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k get po^C
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k describe mysql-0
+error: the server doesn't have a resource type "mysql-0"
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k describe po mysql-0
+Name:           mysql-0
+Namespace:      default
+Priority:       0
+Node:           ubuntu/192.168.0.140
+Start Time:     Mon, 30 Dec 2019 00:15:41 -0800
+Labels:         app=mysql
+                controller-revision-hash=mysql-5c7b6d4648
+                statefulset.kubernetes.io/pod-name=mysql-0
+Annotations:    cni.projectcalico.org/podIP: 192.169.0.76/32
+Status:         Running
+IP:             192.169.0.76
+Controlled By:  StatefulSet/mysql
+Containers:
+  mysqlpod:
+    Container ID:   docker://519b06c44f11aece42d71d193d0cf4be8fc0d19e167a2163cba5e1ac03ea2ed7
+    Image:          mysql:latest
+    Image ID:       docker-pullable://mysql@sha256:c93ba1bafd65888947f5cd8bd45deb7b996885ec2a16c574c530c389335e9169
+    Port:           80/TCP
+    Host Port:      0/TCP
+    State:          Waiting
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Mon, 30 Dec 2019 00:16:35 -0800
+      Finished:     Mon, 30 Dec 2019 00:16:36 -0800
+    Ready:          False
+    Restart Count:  3
+    Environment:
+      MYSQL_ROOT_PASSWORD:  123456
+    Mounts:
+      /var/lib/mysql from db (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-qcsbv (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             False
+  ContainersReady   False
+  PodScheduled      True
+Volumes:
+  db:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  db-mysql-0
+    ReadOnly:   false
+  default-token-qcsbv:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-qcsbv
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type     Reason            Age                From               Message
+  ----     ------            ----               ----               -------
+  Warning  FailedScheduling  106s               default-scheduler  0/1 nodes are available: 1 node(s) had taints that the pod didn't tolerate.
+  Normal   Scheduled         85s                default-scheduler  Successfully assigned default/mysql-0 to ubuntu
+  Normal   Pulled            32s (x4 over 81s)  kubelet, ubuntu    Container image "mysql:latest" already present on machine
+  Normal   Created           32s (x4 over 80s)  kubelet, ubuntu    Created container mysqlpod
+  Normal   Started           31s (x4 over 79s)  kubelet, ubuntu    Started container mysqlpod
+  Warning  BackOff           13s (x5 over 70s)  kubelet, ubuntu    Back-off restarting failed container
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k get po
+NAME      READY   STATUS             RESTARTS   AGE
+mysql-0   0/1     CrashLoopBackOff   3          2m
+
+
+
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type     Reason            Age                From               Message
+  ----     ------            ----               ----               -------
+  Warning  FailedScheduling  106s               default-scheduler  0/1 nodes are available: 1 node(s) had taints that the pod didn't tolerate.
+  Normal   Scheduled         85s                default-scheduler  Successfully assigned default/mysql-0 to ubuntu
+  Normal   Pulled            32s (x4 over 81s)  kubelet, ubuntu    Container image "mysql:latest" already present on machine
+  Normal   Created           32s (x4 over 80s)  kubelet, ubuntu    Created container mysqlpod
+  Normal   Started           31s (x4 over 79s)  kubelet, ubuntu    Started container mysqlpod
+  Warning  BackOff           13s (x5 over 70s)  kubelet, ubuntu    Back-off restarting failed container
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k get po
+NAME      READY   STATUS             RESTARTS   AGE
+mysql-0   0/1     CrashLoopBackOff   3          2m
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ vi 1.txt
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k logs mysql-0
+2019-12-30 08:17:22+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.18-1debian9 started.
+2019-12-30 08:17:23+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2019-12-30 08:17:23+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.18-1debian9 started.
+2019-12-30 08:17:23+00:00 [Note] [Entrypoint]: Initializing database files
+2019-12-30T08:17:24.023513Z 0 [Warning] [MY-011070] [Server] 'Disabling symbolic links using --skip-symbolic-links (or equivalent) is the default. Consider not using this option as it' is deprecated and will be removed in a future release.
+2019-12-30T08:17:24.023950Z 0 [System] [MY-013169] [Server] /usr/sbin/mysqld (mysqld 8.0.18) initializing of server in progress as process 47
+2019-12-30T08:17:24.032999Z 0 [ERROR] [MY-010457] [Server] --initialize specified but the data directory has files in it. Aborting.
+2019-12-30T08:17:24.033010Z 0 [ERROR] [MY-013236] [Server] The designated data directory /var/lib/mysql/ is unusable. You can remove all files that the server added to it.
+2019-12-30T08:17:24.033100Z 0 [ERROR] [MY-010119] [Server] Aborting
+2019-12-30T08:17:24.035397Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.0.18)  MySQL Community Server - GPL.
+
+
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k get po
+NAME      READY   STATUS    RESTARTS   AGE
+mysql-0   1/1     Running   0          10s
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k log mysql-0
+log is DEPRECATED and will be removed in a future version. Use logs instead.
+2019-12-30 08:23:47+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.18-1debian9 started.
+2019-12-30 08:23:50+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2019-12-30 08:23:50+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.18-1debian9 started.
+2019-12-30 08:23:50+00:00 [Note] [Entrypoint]: Initializing database files
+2019-12-30T08:23:51.017844Z 0 [Warning] [MY-011070] [Server] 'Disabling symbolic links using --skip-symbolic-links (or equivalent) is the default. Consider not using this option as it' is deprecated and will be removed in a future release.
+2019-12-30T08:23:51.051929Z 0 [System] [MY-013169] [Server] /usr/sbin/mysqld (mysqld 8.0.18) initializing of server in progress as process 47
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ ^C
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k log mysql-0
+log is DEPRECATED and will be removed in a future version. Use logs instead.
+2019-12-30 08:23:47+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.18-1debian9 started.
+2019-12-30 08:23:50+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2019-12-30 08:23:50+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.18-1debian9 started.
+2019-12-30 08:23:50+00:00 [Note] [Entrypoint]: Initializing database files
+2019-12-30T08:23:51.017844Z 0 [Warning] [MY-011070] [Server] 'Disabling symbolic links using --skip-symbolic-links (or equivalent) is the default. Consider not using this option as it' is deprecated and will be removed in a future release.
+2019-12-30T08:23:51.051929Z 0 [System] [MY-013169] [Server] /usr/sbin/mysqld (mysqld 8.0.18) initializing of server in progress as process 47
+2019-12-30T08:24:13.013073Z 5 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k describe po master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k log mysql-0
+^C
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k describe po mysql-0
+
+
+Name:           mysql-0
+Namespace:      default
+Priority:       0
+Node:           ubuntu/192.168.0.140
+Start Time:     Mon, 30 Dec 2019 00:23:42 -0800
+Labels:         app=mysql
+                controller-revision-hash=mysql-5c7b6d4648
+                statefulset.kubernetes.io/pod-name=mysql-0
+Annotations:    cni.projectcalico.org/podIP: 192.169.0.79/32
+Status:         Running
+IP:             192.169.0.79
+Controlled By:  StatefulSet/mysql
+Containers:
+  mysqlpod:
+    Container ID:   docker://336213c4d302b1c8b8d4f48e1e570527da20b7d90d930e37814d051154d1b20d
+    Image:          mysql:latest
+    Image ID:       docker-pullable://mysql@sha256:c93ba1bafd65888947f5cd8bd45deb7b996885ec2a16c574c530c389335e9169
+    Port:           80/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Mon, 30 Dec 2019 00:23:47 -0800
+    Ready:          True
+    Restart Count:  0
+    Environment:
+      MYSQL_ROOT_PASSWORD:  123456
+    Mounts:
+      /var/lib/mysql from db (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-ks9wk (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             True
+  ContainersReady   True
+  PodScheduled      True
+Volumes:
+  db:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  db-mysql-0
+    ReadOnly:   false
+  default-token-ks9wk:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-ks9wk
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  94s   default-scheduler  Successfully assigned default/mysql-0 to ubuntu
+  Normal  Pulled     90s   kubelet, ubuntu    Container image "mysql:latest" already present on machine
+  Normal  Created    90s   kubelet, ubuntu    Created container mysqlpod
+  Normal  Started    89s   kubelet, ubuntu    Started container mysqlpod
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ ls /nfsroot/
+ auto.cnf        ca-key.pem        client-key.pem   ib_logfile0  '#innodb_temp'   performance_schema   server-cert.pem   undo_001
+ binlog.000001   ca.pem            ib_buffer_pool   ib_logfile1   mysql           private_key.pem      server-key.pem    undo_002
+ binlog.index    client-cert.pem   ibdata1          ibtmp1        mysql.ibd       public_key.pem       sys
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$
+
+
+
+
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k get po
+NAME      READY   STATUS    RESTARTS   AGE
+mysql-0   1/1     Running   0          2m50s
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k logs mysql-0
+2019-12-30 08:23:47+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.18-1debian9 started.
+2019-12-30 08:23:50+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2019-12-30 08:23:50+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.18-1debian9 started.
+2019-12-30 08:23:50+00:00 [Note] [Entrypoint]: Initializing database files
+2019-12-30T08:23:51.017844Z 0 [Warning] [MY-011070] [Server] 'Disabling symbolic links using --skip-symbolic-links (or equivalent) is the default. Consider not using this option as it' is deprecated and will be removed in a future release.
+2019-12-30T08:23:51.051929Z 0 [System] [MY-013169] [Server] /usr/sbin/mysqld (mysqld 8.0.18) initializing of server in progress as process 47
+2019-12-30T08:24:13.013073Z 5 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+2019-12-30 08:24:29+00:00 [Note] [Entrypoint]: Database files initialized
+2019-12-30 08:24:29+00:00 [Note] [Entrypoint]: Starting temporary server
+2019-12-30T08:24:31.274206Z 0 [Warning] [MY-011070] [Server] 'Disabling symbolic links using --skip-symbolic-links (or equivalent) is the default. Consider not using this option as it' is deprecated and will be removed in a future release.
+2019-12-30T08:24:31.274931Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.18) starting as process 96
+2019-12-30T08:24:38.101480Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2019-12-30T08:24:38.254984Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+2019-12-30T08:24:38.784009Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.18'  socket: '/var/run/mysqld/mysqld.sock'  port: 0  MySQL Community Server - GPL.
+2019-12-30T08:24:39.213767Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Socket: '/var/run/mysqld/mysqlx.sock'
+2019-12-30 08:24:40+00:00 [Note] [Entrypoint]: Temporary server started.
+Warning: Unable to load '/usr/share/zoneinfo/iso3166.tab' as time zone. Skipping it.
+Warning: Unable to load '/usr/share/zoneinfo/leap-seconds.list' as time zone. Skipping it.
+Warning: Unable to load '/usr/share/zoneinfo/zone.tab' as time zone. Skipping it.
+Warning: Unable to load '/usr/share/zoneinfo/zone1970.tab' as time zone. Skipping it.
+
+2019-12-30 08:25:34+00:00 [Note] [Entrypoint]: Stopping temporary server
+2019-12-30T08:25:39.137379Z 10 [System] [MY-013172] [Server] Received SHUTDOWN from user root. Shutting down mysqld (Version: 8.0.18).
+2019-12-30T08:25:44.515029Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.0.18)  MySQL Community Server - GPL.
+2019-12-30 08:25:45+00:00 [Note] [Entrypoint]: Temporary server stopped
+
+2019-12-30 08:25:45+00:00 [Note] [Entrypoint]: MySQL init process done. Ready for start up.
+
+2019-12-30T08:25:47.086070Z 0 [Warning] [MY-011070] [Server] 'Disabling symbolic links using --skip-symbolic-links (or equivalent) is the default. Consider not using this option as it' is deprecated and will be removed in a future release.
+2019-12-30T08:25:47.127837Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.18) starting as process 1
+2019-12-30T08:25:58.700858Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2019-12-30T08:25:58.836034Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+2019-12-30T08:25:59.755901Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.18'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+2019-12-30T08:26:00.028733Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Socket: '/var/run/mysqld/mysqlx.sock' bind-address: '::' port: 33060
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$ k log mysql-0
+log is DEPRECATED and will be removed in a future version. Use logs instead.
+2019-12-30 08:23:47+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.18-1debian9 started.
+2019-12-30 08:23:50+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+2019-12-30 08:23:50+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.18-1debian9 started.
+2019-12-30 08:23:50+00:00 [Note] [Entrypoint]: Initializing database files
+2019-12-30T08:23:51.017844Z 0 [Warning] [MY-011070] [Server] 'Disabling symbolic links using --skip-symbolic-links (or equivalent) is the default. Consider not using this option as it' is deprecated and will be removed in a future release.
+2019-12-30T08:23:51.051929Z 0 [System] [MY-013169] [Server] /usr/sbin/mysqld (mysqld 8.0.18) initializing of server in progress as process 47
+2019-12-30T08:24:13.013073Z 5 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+2019-12-30 08:24:29+00:00 [Note] [Entrypoint]: Database files initialized
+2019-12-30 08:24:29+00:00 [Note] [Entrypoint]: Starting temporary server
+2019-12-30T08:24:31.274206Z 0 [Warning] [MY-011070] [Server] 'Disabling symbolic links using --skip-symbolic-links (or equivalent) is the default. Consider not using this option as it' is deprecated and will be removed in a future release.
+2019-12-30T08:24:31.274931Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.18) starting as process 96
+2019-12-30T08:24:38.101480Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2019-12-30T08:24:38.254984Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+2019-12-30T08:24:38.784009Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.18'  socket: '/var/run/mysqld/mysqld.sock'  port: 0  MySQL Community Server - GPL.
+2019-12-30T08:24:39.213767Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Socket: '/var/run/mysqld/mysqlx.sock'
+2019-12-30 08:24:40+00:00 [Note] [Entrypoint]: Temporary server started.
+Warning: Unable to load '/usr/share/zoneinfo/iso3166.tab' as time zone. Skipping it.
+Warning: Unable to load '/usr/share/zoneinfo/leap-seconds.list' as time zone. Skipping it.
+Warning: Unable to load '/usr/share/zoneinfo/zone.tab' as time zone. Skipping it.
+Warning: Unable to load '/usr/share/zoneinfo/zone1970.tab' as time zone. Skipping it.
+
+2019-12-30 08:25:34+00:00 [Note] [Entrypoint]: Stopping temporary server
+2019-12-30T08:25:39.137379Z 10 [System] [MY-013172] [Server] Received SHUTDOWN from user root. Shutting down mysqld (Version: 8.0.18).
+2019-12-30T08:25:44.515029Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.0.18)  MySQL Community Server - GPL.
+2019-12-30 08:25:45+00:00 [Note] [Entrypoint]: Temporary server stopped
+
+2019-12-30 08:25:45+00:00 [Note] [Entrypoint]: MySQL init process done. Ready for start up.
+
+2019-12-30T08:25:47.086070Z 0 [Warning] [MY-011070] [Server] 'Disabling symbolic links using --skip-symbolic-links (or equivalent) is the default. Consider not using this option as it' is deprecated and will be removed in a future release.
+2019-12-30T08:25:47.127837Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.18) starting as process 1
+2019-12-30T08:25:58.700858Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2019-12-30T08:25:58.836034Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+2019-12-30T08:25:59.755901Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.18'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+2019-12-30T08:26:00.028733Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Socket: '/var/run/mysqld/mysqlx.sock' bind-address: '::' port: 33060
+master@ubuntu:~/k8s_yaml/volumeclaimtemplate$
+
