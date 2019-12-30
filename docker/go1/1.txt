@@ -1,0 +1,55 @@
+node2@ubuntu:~/k8s_yaml/docker/go1$ sudo docker build -t lijincheng1/dockergo .
+[sudo] password for node2:
+Sending build context to Docker daemon  7.458MB
+Step 1/7 : FROM golang
+latest: Pulling from library/golang
+8f0fdd3eaac0: Pull complete
+d918eaefd9de: Pull complete
+43bf3e3107f5: Pull complete
+27622921edb2: Pull complete
+f862a94ee651: Pull complete
+ff0de9db1ab2: Downloading [================================================>  ]  116.5MB/120.1MB
+a4db81ef5640: Download complete
+
+ff0de9db1ab2: Pull complete
+a4db81ef5640: Pull complete
+Digest: sha256:8e6da9197b0d8f0828e54e78d5f6ff570b423efbba8ff651deff581f71bee332
+Status: Downloaded newer image for golang:latest
+ ---> ed081345a3da
+Step 2/7 : MAINTAINER zedididi "zediv1"
+ ---> Running in 8af5df80dcf0
+Removing intermediate container 8af5df80dcf0
+ ---> 437660fb22e0
+Step 3/7 : WORKDIR $GOPATH/src/godocker
+ ---> Running in cf155dfdcf18
+Removing intermediate container cf155dfdcf18
+ ---> 4dbb214772d8
+Step 4/7 : ADD . $GOPATH/src/godocker
+ ---> 6ad73d216e71
+Step 5/7 : RUN go build main.go
+ ---> Running in 467a3e5811b2
+Removing intermediate container 467a3e5811b2
+ ---> b281b7dfa3e1
+Step 6/7 : EXPOSE 8080
+ ---> Running in e053100fdce8
+Removing intermediate container e053100fdce8
+ ---> b36f5bad8869
+Step 7/7 : ENTRYPOINT ["./main"]
+ ---> Running in 124dc0de4eec
+Removing intermediate container 124dc0de4eec
+ ---> f91c373fe962
+Successfully built f91c373fe962
+Successfully tagged lijincheng1/dockergo:latest
+node2@ubuntu:~/k8s_yaml/docker/go1$
+node2@ubuntu:~/k8s_yaml/docker/go1$
+node2@ubuntu:~/k8s_yaml/docker/go1$
+node2@ubuntu:~/k8s_yaml/docker/go1$ sudo docker images
+REPOSITORY                                                        TAG                 IMAGE ID            CREATED             SIZE
+lijincheng1/dockergo                                              latest              f91c373fe962        13 seconds ago      818MB
+golang                          
+
+
+node2@ubuntu:~/k8s_yaml/docker/go1$ sudo docker run -p 5005:5005 -d lijincheng1/dockergo
+e989c4d750eaed9372519e97e5a17b8c429207bb5fa4cb48bbf2579bd649d174
+node2@ubuntu:~/k8s_yaml/docker/go1$ curl http://localhost:5005/zc
+Hello Docker Form Golang!
