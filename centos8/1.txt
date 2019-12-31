@@ -1,0 +1,395 @@
+[user1@localhost k8s]$ chmod a+x install-k8s.sh 
+[user1@localhost k8s]$ sudo ls
+2019-k8s-centos  install-k8s.sh
+[user1@localhost k8s]$ ./install-k8s.sh 
+Start
+Device "enp0s8" does not exist.
+
+Removed /etc/systemd/system/multi-user.target.wants/firewalld.service.
+Removed /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service.
+Waiting for process with pid 3723 to finish.
+
+上次元数据过期检查：0:00:01 前，执行于 2019年12月30日 星期一 21时48分34秒。
+依赖关系解决。
+=======================================================================================
+ 软件包              架构             版本                      仓库              大小
+=======================================================================================
+Installing:
+ dnf-utils           noarch           4.0.2.2-3.el8             BaseOS            62 k
+
+事务概要
+=======================================================================================
+安装  1 软件包
+
+总下载：62 k
+安装大小：18 k
+下载软件包：
+dnf-utils-4.0.2.2-3.el8.noarch.rpm                      27 kB/s |  62 kB     00:02    
+---------------------------------------------------------------------------------------
+总计                                                    12 kB/s |  62 kB     00:05     
+警告：/var/cache/dnf/BaseOS-929b586ef1f72f69/packages/dnf-utils-4.0.2.2-3.el8.noarch.rpm: 头V3 RSA/SHA256 Signature, 密钥 ID 8483c65d: NOKEY
+CentOS-8 - Base                                         20 kB/s | 1.6 kB     00:00    
+导入 GPG 公钥 0x8483C65D:
+ Userid: "CentOS (CentOS Official Signing Key) <security@centos.org>"
+ 指纹: 99DB 70FA E1D7 CE22 7FB6 4882 05B5 55B3 8483 C65D
+ 来自: /etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+导入公钥成功
+运行事务检查
+事务检查成功。
+运行事务测试
+事务测试成功。
+运行事务
+  准备中      :                                                                    1/1 
+  Installing  : dnf-utils-4.0.2.2-3.el8.noarch                                     1/1 
+  运行脚本    : dnf-utils-4.0.2.2-3.el8.noarch                                     1/1 
+  验证        : dnf-utils-4.0.2.2-3.el8.noarch                                     1/1 
+
+已安装:
+  dnf-utils-4.0.2.2-3.el8.noarch                                                       
+
+完毕！
+ip_vs_sh               16384  0
+ip_vs_wrr              16384  0
+ip_vs_rr               16384  0
+ip_vs                 172032  6 ip_vs_rr,ip_vs_sh,ip_vs_wrr
+nf_defrag_ipv6         20480  2 nf_conntrack_ipv6,ip_vs
+nf_conntrack_ipv4      16384  1
+nf_defrag_ipv4         16384  1 nf_conntrack_ipv4
+nf_conntrack          155648  6 nf_conntrack_ipv6,nf_conntrack_ipv4,nf_nat,nf_nat_ipv6,nf_nat_ipv4,ip_vs
+libcrc32c              16384  4 nf_conntrack,nf_nat,xfs,ip_vs
+上次元数据过期检查：0:00:09 前，执行于 2019年12月30日 星期一 21时48分34秒。
+Package ipset-6.38-3.el8.x86_64 is already installed.
+依赖关系解决。
+=======================================================================================
+ 软件包             架构              版本                  仓库                  大小
+=======================================================================================
+Installing:
+ ipvsadm            x86_64            1.29-8.el8            AppStream             57 k
+
+事务概要
+=======================================================================================
+安装  1 软件包
+
+总下载：57 k
+安装大小：83 k
+下载软件包：
+ipvsadm-1.29-8.el8.x86_64.rpm                           25 kB/s |  57 kB     00:02    
+---------------------------------------------------------------------------------------
+总计                                                    12 kB/s |  57 kB     00:04     
+运行事务检查
+事务检查成功。
+运行事务测试
+事务测试成功。
+运行事务
+  准备中      :                                                                    1/1 
+  Installing  : ipvsadm-1.29-8.el8.x86_64                                          1/1 
+  运行脚本    : ipvsadm-1.29-8.el8.x86_64                                          1/1 
+  验证        : ipvsadm-1.29-8.el8.x86_64                                          1/1 
+
+已安装:
+  ipvsadm-1.29-8.el8.x86_64                                                            
+
+完毕！
+* Applying /usr/lib/sysctl.d/10-default-yama-scope.conf ...
+kernel.yama.ptrace_scope = 0
+* Applying /usr/lib/sysctl.d/50-coredump.conf ...
+kernel.core_pattern = |/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h %e
+* Applying /usr/lib/sysctl.d/50-default.conf ...
+kernel.sysrq = 16
+kernel.core_uses_pid = 1
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.all.accept_source_route = 0
+net.ipv4.conf.all.promote_secondaries = 1
+net.core.default_qdisc = fq_codel
+fs.protected_hardlinks = 1
+fs.protected_symlinks = 1
+* Applying /usr/lib/sysctl.d/50-libkcapi-optmem_max.conf ...
+net.core.optmem_max = 81920
+* Applying /usr/lib/sysctl.d/60-libvirtd.conf ...
+fs.aio-max-nr = 1048576
+* Applying /etc/sysctl.d/99-sysctl.conf ...
+* Applying /etc/sysctl.d/k8s.conf ...
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+* Applying /etc/sysctl.conf ...
+添加仓库自：https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+元数据缓存近期已刷新。
+CentOS-8 - AppStream                                   848  B/s | 4.3 kB     00:05    
+CentOS-8 - Base                                        853  B/s | 3.9 kB     00:04    
+CentOS-8 - Extras                                      0.0  B/s |   0  B     00:33    
+Docker CE Stable - x86_64                              4.1 kB/s |  21 kB     00:05    
+同步仓库 'extras' 缓存失败，忽略这个 repo。
+依赖关系解决。
+
+ 问题: package docker-ce-3:19.03.5-3.el7.x86_64 requires containerd.io >= 1.2.2-3, but none of the providers can be installed
+  - cannot install the best candidate for the job
+  - package containerd.io-1.2.10-3.2.el7.x86_64 is excluded
+  - package containerd.io-1.2.2-3.3.el7.x86_64 is excluded
+  - package containerd.io-1.2.2-3.el7.x86_64 is excluded
+  - package containerd.io-1.2.4-3.1.el7.x86_64 is excluded
+  - package containerd.io-1.2.5-3.1.el7.x86_64 is excluded
+  - package containerd.io-1.2.6-3.3.el7.x86_64 is excluded
+=======================================================================================
+ 软件包           架构          版本                     仓库                     大小
+=======================================================================================
+Installing:
+ docker-ce        x86_64        18.06.3.ce-3.el7         docker-ce-stable         41 M
+安装依赖关系:
+ libcgroup        x86_64        0.41-19.el8              BaseOS                   70 k
+跳过存在损坏依赖关系的软件包 :
+ docker-ce        x86_64        3:19.03.5-3.el7          docker-ce-stable         24 M
+
+事务概要
+=======================================================================================
+安装  2 软件包
+跳过  1 软件包
+
+总下载：41 M
+安装大小：168 M
+下载软件包：
+(1/2): libcgroup-0.41-19.el8.x86_64.rpm                 27 kB/s |  70 kB     00:02    
+(2/2): docker-ce-18.06.3.ce-3.el7.x86_64.rpm           797 kB/s |  41 MB     00:52    
+---------------------------------------------------------------------------------------
+总计                                                   759 kB/s |  41 MB     00:55     
+警告：/var/cache/dnf/docker-ce-stable-3e5647bf4960c796/packages/docker-ce-18.06.3.ce-3.el7.x86_64.rpm: 头V4 RSA/SHA512 Signature, 密钥 ID 621e9f35: NOKEY
+Docker CE Stable - x86_64                              650  B/s | 1.6 kB     00:02    
+导入 GPG 公钥 0x621E9F35:
+ Userid: "Docker Release (CE rpm) <docker@docker.com>"
+ 指纹: 060A 61C5 1B55 8A7F 742B 77AA C52F EB6B 621E 9F35
+ 来自: https://mirrors.aliyun.com/docker-ce/linux/centos/gpg
+导入公钥成功
+运行事务检查
+事务检查成功。
+运行事务测试
+事务测试成功。
+运行事务
+  准备中      :                                                                    1/1 
+  运行脚本    : libcgroup-0.41-19.el8.x86_64                                       1/2 
+  Installing  : libcgroup-0.41-19.el8.x86_64                                       1/2 
+  运行脚本    : libcgroup-0.41-19.el8.x86_64                                       1/2 
+  运行脚本    : docker-ce-18.06.3.ce-3.el7.x86_64                                  2/2 
+  Installing  : docker-ce-18.06.3.ce-3.el7.x86_64                                  2/2 
+  运行脚本    : docker-ce-18.06.3.ce-3.el7.x86_64                                  2/2 
+  验证        : libcgroup-0.41-19.el8.x86_64                                       1/2 
+  验证        : docker-ce-18.06.3.ce-3.el7.x86_64                                  2/2 
+
+已安装:
+  docker-ce-18.06.3.ce-3.el7.x86_64            libcgroup-0.41-19.el8.x86_64           
+
+Skipped:
+  docker-ce-3:19.03.5-3.el7.x86_64                                                     
+
+完毕！
+Created symlink /etc/systemd/system/multi-user.target.wants/docker.service → /usr/lib/systemd/system/docker.service.
+Kubernetes                                              89  B/s | 454  B     00:05    
+Kubernetes                                             831  B/s | 1.8 kB     00:02    
+导入 GPG 公钥 0xA7317B0F:
+ Userid: "Google Cloud Packages Automatic Signing Key <gc-team@google.com>"
+ 指纹: D0BC 747F D8CA F711 7500 D6FA 3746 C208 A731 7B0F
+ 来自: https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg
+导入 GPG 公钥 0xBA07F4FB:
+ Userid: "Google Cloud Packages Automatic Signing Key <gc-team@google.com>"
+ 指纹: 54A6 47F9 048D 5688 D7DA 2ABE 6A03 0B21 BA07 F4FB
+ 来自: https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg
+Kubernetes                                             402  B/s | 975  B     00:02    
+导入 GPG 公钥 0x3E1BA8D5:
+ Userid: "Google Cloud Packages RPM Signing Key <gc-team@google.com>"
+ 指纹: 3749 E1BA 95A8 6CE0 5454 6ED2 F09C 394C 3E1B A8D5
+ 来自: https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+Kubernetes                                              11 kB/s |  82 kB     00:07    
+依赖关系解决。
+=======================================================================================
+ 软件包                       架构         版本                 仓库              大小
+=======================================================================================
+Installing:
+ kubeadm                      x86_64       1.17.0-0             kubernetes       8.7 M
+ kubectl                      x86_64       1.17.0-0             kubernetes       9.4 M
+ kubelet                      x86_64       1.17.0-0             kubernetes        20 M
+安装依赖关系:
+ socat                        x86_64       1.7.3.2-6.el8        AppStream        298 k
+ conntrack-tools              x86_64       1.4.4-9.el8          BaseOS           205 k
+ libnetfilter_cthelper        x86_64       1.0.0-13.el8         BaseOS            24 k
+ libnetfilter_cttimeout       x86_64       1.0.0-11.el8         BaseOS            24 k
+ libnetfilter_queue           x86_64       1.0.2-11.el8         BaseOS            30 k
+ cri-tools                    x86_64       1.13.0-0             kubernetes       5.1 M
+ kubernetes-cni               x86_64       0.7.5-0              kubernetes        10 M
+
+事务概要
+=======================================================================================
+安装  10 软件包
+
+总下载：54 M
+安装大小：243 M
+下载软件包：
+(1/10): libnetfilter_cthelper-1.0.0-13.el8.x86_64.rpm  9.8 kB/s |  24 kB     00:02    
+(2/10): libnetfilter_cttimeout-1.0.0-11.el8.x86_64.rpm 332 kB/s |  24 kB     00:00    
+(3/10): conntrack-tools-1.4.4-9.el8.x86_64.rpm          74 kB/s | 205 kB     00:02    
+(4/10): libnetfilter_queue-1.0.2-11.el8.x86_64.rpm     130 kB/s |  30 kB     00:00    
+(5/10): socat-1.7.3.2-6.el8.x86_64.rpm                  96 kB/s | 298 kB     00:03    
+(6/10): 14bfe6e75a9efc8eca3f638eb22c7e2ce759c67f95b43b 568 kB/s | 5.1 MB     00:09    
+(7/10): bf67b612b185159556555b03e1e3a1ac5b10096afe48e4 653 kB/s | 9.4 MB     00:14    
+(8/10): 2c6d2fa074d044b3c58ce931349e74c25427f173242c6a 566 kB/s | 8.7 MB     00:15    
+(9/10): 548a0dcd865c16a50980420ddfa5fbccb8b59621179798 847 kB/s |  10 MB     00:12    
+(10/10): 7d9e0a47eb6eaf5322bd45f05a2360a033c29845543a4 786 kB/s |  20 MB     00:26    
+---------------------------------------------------------------------------------------
+总计                                                   1.2 MB/s |  54 MB     00:43     
+警告：/var/cache/dnf/kubernetes-d03a9fe438e18cac/packages/14bfe6e75a9efc8eca3f638eb22c7e2ce759c67f95b43b16fae4ebabde1549f3-cri-tools-1.13.0-0.x86_64.rpm: 头V4 RSA/SHA512 Signature, 密钥 ID 3e1ba8d5: NOKEY
+Kubernetes                                             815  B/s | 1.8 kB     00:02    
+导入 GPG 公钥 0xA7317B0F:
+ Userid: "Google Cloud Packages Automatic Signing Key <gc-team@google.com>"
+ 指纹: D0BC 747F D8CA F711 7500 D6FA 3746 C208 A731 7B0F
+ 来自: https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg
+导入公钥成功
+导入 GPG 公钥 0xBA07F4FB:
+ Userid: "Google Cloud Packages Automatic Signing Key <gc-team@google.com>"
+ 指纹: 54A6 47F9 048D 5688 D7DA 2ABE 6A03 0B21 BA07 F4FB
+ 来自: https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg
+导入公钥成功
+Kubernetes                                             425  B/s | 975  B     00:02    
+导入 GPG 公钥 0x3E1BA8D5:
+ Userid: "Google Cloud Packages RPM Signing Key <gc-team@google.com>"
+ 指纹: 3749 E1BA 95A8 6CE0 5454 6ED2 F09C 394C 3E1B A8D5
+ 来自: https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+导入公钥成功
+运行事务检查
+事务检查成功。
+运行事务测试
+事务测试成功。
+运行事务
+  准备中      :                                                                    1/1 
+  Installing  : kubectl-1.17.0-0.x86_64                                           1/10 
+  Installing  : cri-tools-1.13.0-0.x86_64                                         2/10 
+  Installing  : libnetfilter_queue-1.0.2-11.el8.x86_64                            3/10 
+  运行脚本    : libnetfilter_queue-1.0.2-11.el8.x86_64                            3/10 
+  Installing  : libnetfilter_cttimeout-1.0.0-11.el8.x86_64                        4/10 
+  运行脚本    : libnetfilter_cttimeout-1.0.0-11.el8.x86_64                        4/10 
+  Installing  : libnetfilter_cthelper-1.0.0-13.el8.x86_64                         5/10 
+  运行脚本    : libnetfilter_cthelper-1.0.0-13.el8.x86_64                         5/10 
+  Installing  : conntrack-tools-1.4.4-9.el8.x86_64                                6/10 
+  运行脚本    : conntrack-tools-1.4.4-9.el8.x86_64                                6/10 
+  Installing  : socat-1.7.3.2-6.el8.x86_64                                        7/10 
+  Installing  : kubernetes-cni-0.7.5-0.x86_64                                     8/10 
+  Installing  : kubelet-1.17.0-0.x86_64                                           9/10 
+警告：/etc/sysconfig/kubelet 已建立为 /etc/sysconfig/kubelet.rpmnew 
+
+  Installing  : kubeadm-1.17.0-0.x86_64                                          10/10 
+  运行脚本    : kubeadm-1.17.0-0.x86_64                                          10/10 
+  验证        : socat-1.7.3.2-6.el8.x86_64                                        1/10 
+  验证        : conntrack-tools-1.4.4-9.el8.x86_64                                2/10 
+  验证        : libnetfilter_cthelper-1.0.0-13.el8.x86_64                         3/10 
+  验证        : libnetfilter_cttimeout-1.0.0-11.el8.x86_64                        4/10 
+  验证        : libnetfilter_queue-1.0.2-11.el8.x86_64                            5/10 
+  验证        : cri-tools-1.13.0-0.x86_64                                         6/10 
+  验证        : kubeadm-1.17.0-0.x86_64                                           7/10 
+  验证        : kubectl-1.17.0-0.x86_64                                           8/10 
+  验证        : kubelet-1.17.0-0.x86_64                                           9/10 
+  验证        : kubernetes-cni-0.7.5-0.x86_64                                    10/10 
+
+已安装:
+  kubeadm-1.17.0-0.x86_64                    kubectl-1.17.0-0.x86_64                  
+  kubelet-1.17.0-0.x86_64                    socat-1.7.3.2-6.el8.x86_64               
+  conntrack-tools-1.4.4-9.el8.x86_64         libnetfilter_cthelper-1.0.0-13.el8.x86_64
+  libnetfilter_cttimeout-1.0.0-11.el8.x86_64 libnetfilter_queue-1.0.2-11.el8.x86_64   
+  cri-tools-1.13.0-0.x86_64                  kubernetes-cni-0.7.5-0.x86_64            
+
+完毕！
+Created symlink /etc/systemd/system/multi-user.target.wants/kubelet.service → /usr/lib/systemd/system/kubelet.service.
+
+W1230 21:52:33.154833   33970 version.go:101] could not fetch a Kubernetes version from the internet: unable to get URL "https://dl.k8s.io/release/stable-1.16.txt": Get https://dl.k8s.io/release/stable-1.16.txt: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)
+W1230 21:52:33.154948   33970 version.go:102] falling back to the local client version: v1.17.0
+W1230 21:52:33.155114   33970 validation.go:28] Cannot validate kube-proxy config - no validator is available
+W1230 21:52:33.155183   33970 validation.go:28] Cannot validate kubelet config - no validator is available
+[init] Using Kubernetes version: v1.17.0
+[preflight] Running pre-flight checks
+	[WARNING Swap]: running with swap on is not supported. Please disable swap
+[preflight] Pulling images required for setting up a Kubernetes cluster
+[preflight] This might take a minute or two, depending on the speed of your internet connection
+[preflight] You can also perform this action in beforehand using 'kubeadm config images pull'
+[kubelet-start] Writing kubelet environment file with flags to file "/var/lib/kubelet/kubeadm-flags.env"
+[kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+[kubelet-start] Starting the kubelet
+[certs] Using certificateDir folder "/etc/kubernetes/pki"
+[certs] Generating "ca" certificate and key
+[certs] Generating "apiserver" certificate and key
+[certs] apiserver serving cert is signed for DNS names [master.example.com kubernetes kubernetes.default kubernetes.default.svc kubernetes.default.svc.cluster.local] and IPs [10.96.0.1 192.168.0.141]
+[certs] Generating "apiserver-kubelet-client" certificate and key
+[certs] Generating "front-proxy-ca" certificate and key
+[certs] Generating "front-proxy-client" certificate and key
+[certs] Generating "etcd/ca" certificate and key
+[certs] Generating "etcd/server" certificate and key
+[certs] etcd/server serving cert is signed for DNS names [master.example.com localhost] and IPs [192.168.0.141 127.0.0.1 ::1]
+[certs] Generating "etcd/peer" certificate and key
+[certs] etcd/peer serving cert is signed for DNS names [master.example.com localhost] and IPs [192.168.0.141 127.0.0.1 ::1]
+[certs] Generating "etcd/healthcheck-client" certificate and key
+[certs] Generating "apiserver-etcd-client" certificate and key
+[certs] Generating "sa" key and public key
+[kubeconfig] Using kubeconfig folder "/etc/kubernetes"
+[kubeconfig] Writing "admin.conf" kubeconfig file
+[kubeconfig] Writing "kubelet.conf" kubeconfig file
+[kubeconfig] Writing "controller-manager.conf" kubeconfig file
+[kubeconfig] Writing "scheduler.conf" kubeconfig file
+[control-plane] Using manifest folder "/etc/kubernetes/manifests"
+[control-plane] Creating static Pod manifest for "kube-apiserver"
+[control-plane] Creating static Pod manifest for "kube-controller-manager"
+W1230 21:59:02.888770   33970 manifests.go:214] the default kube-apiserver authorization-mode is "Node,RBAC"; using "Node,RBAC"
+[control-plane] Creating static Pod manifest for "kube-scheduler"
+W1230 21:59:02.890010   33970 manifests.go:214] the default kube-apiserver authorization-mode is "Node,RBAC"; using "Node,RBAC"
+[etcd] Creating static Pod manifest for local etcd in "/etc/kubernetes/manifests"
+[wait-control-plane] Waiting for the kubelet to boot up the control plane as static Pods from directory "/etc/kubernetes/manifests". This can take up to 4m0s
+[apiclient] All control plane components are healthy after 27.279454 seconds
+[upload-config] Storing the configuration used in ConfigMap "kubeadm-config" in the "kube-system" Namespace
+[kubelet] Creating a ConfigMap "kubelet-config-1.17" in namespace kube-system with the configuration for the kubelets in the cluster
+[upload-certs] Skipping phase. Please see --upload-certs
+[mark-control-plane] Marking the node master.example.com as control-plane by adding the label "node-role.kubernetes.io/master=''"
+[mark-control-plane] Marking the node master.example.com as control-plane by adding the taints [node-role.kubernetes.io/master:NoSchedule]
+[bootstrap-token] Using token: j5gwj1.x8ahe1juvwliymsz
+[bootstrap-token] Configuring bootstrap tokens, cluster-info ConfigMap, RBAC Roles
+[bootstrap-token] configured RBAC rules to allow Node Bootstrap tokens to post CSRs in order for nodes to get long term certificate credentials
+[bootstrap-token] configured RBAC rules to allow the csrapprover controller automatically approve CSRs from a Node Bootstrap Token
+[bootstrap-token] configured RBAC rules to allow certificate rotation for all node client certificates in the cluster
+[bootstrap-token] Creating the "cluster-info" ConfigMap in the "kube-public" namespace
+[kubelet-finalize] Updating "/etc/kubernetes/kubelet.conf" to point to a rotatable kubelet client certificate and key
+[addons] Applied essential addon: CoreDNS
+[addons] Applied essential addon: kube-proxy
+
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 192.168.0.141:6443 --token j5gwj1.x8ahe1juvwliymsz \
+    --discovery-token-ca-cert-hash sha256:9d93dad913e274b25b0cf70a0e110a5db6f4bdf6b1c44467a40c838161869ac0 
+[sudo] user1 的密码：
+[sudo] user1 的密码：
+对不起，请重试。
+[sudo] user1 的密码：
+The connection to the server raw.githubusercontent.com was refused - did you specify the right host or port?
+podsecuritypolicy.policy/psp.flannel.unprivileged created
+clusterrole.rbac.authorization.k8s.io/flannel created
+clusterrolebinding.rbac.authorization.k8s.io/flannel created
+serviceaccount/flannel created
+configmap/kube-flannel-cfg created
+daemonset.apps/kube-flannel-ds-amd64 created
+daemonset.apps/kube-flannel-ds-arm64 created
+daemonset.apps/kube-flannel-ds-arm created
+daemonset.apps/kube-flannel-ds-ppc64le created
+daemonset.apps/kube-flannel-ds-s390x created
+node/master.example.com untainted
+./install-k8s.sh:行128: 寻找匹配的 `"' 是遇到了未预期的文件结束符
+./install-k8s.sh:行129: 语法错误: 未预期的文件结尾
+[user1@localhost k8s]$ kubectl get po
+No resources found in default namespace.
+[user1@localhost k8s]$ kubectl get node
+NAME                 STATUS   ROLES    AGE    VERSION
+master.example.com   Ready    master   4m9s   v1.17.0
+
