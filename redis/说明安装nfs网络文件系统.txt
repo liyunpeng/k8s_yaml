@@ -3,7 +3,9 @@ pvc 依赖于pv， pv依赖于nfs文件系统，
 nfs文件系统建立在192.168.0.211主机下， 
 其他每台主机挂载;
 $ mount -t nfs 192.168.0.211:/usr/local/k8s/redis/pv1  ./a
-向本地目录a,touch一个文件， 到192.168.0.211主机下的/usr/local/k8s/redis/pv1目录下能看到这个文件。 就说明成功
+向本地目录a,touch一个文件， 到192.168.0.211主机下的/usr/local/k8s/redis/pv1目录下能看到这个文件。就说明成功
+去掉挂载的命令：
+$ sudo umount 192.168.0.211:/usr/local/k8s/redis/pv4
 
 nfs文件系统的配置写好后, 就可以启动nfs服务..    遇到了三个问题，  其他主机安装nfs客户端，配置文件没写对，作为nfs文件系统的/usr/local/k8s/redis/ 没有给其他用户写的权限。
 细说这三个问题：
