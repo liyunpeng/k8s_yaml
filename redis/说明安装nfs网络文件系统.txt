@@ -27,7 +27,18 @@ sudo apt-get install nfs-common, 安装nfs客户端
 3.  挂载之后，不能写文件：
 到/usr/local/k8s/redis目下，将所有子文件夹该为777权限
 user@ /usr/local/k8s/redis$ sudo chmod 777 *
-第一目标实现后， 在去创建pv, pvc, 
+node1@docker-app:/usr/local/k8s/redis$ sudo chmod 777 *
+node1@docker-app:/usr/local/k8s/redis$ ll
+total 32
+drwxr-xr-x 8 root root 4096 Dec 29 10:24 ./
+drwxr-xr-x 3 root root 4096 Dec 29 10:24 ../
+drwxrwxrwx 2 root root 4096 Dec 29 10:24 pv1/
+drwxrwxrwx 2 root root 4096 Dec 29 10:24 pv2/
+drwxrwxrwx 2 root root 4096 Dec 29 10:24 pv3/
+drwxrwxrwx 2 root root 4096 Dec 30 23:01 pv4/
+drwxrwxrwx 2 root root 4096 Dec 29 10:24 pv5/
+drwxrwxrwx 2 root root 4096 Dec 29 10:24 pv6/
+
 4.  /etc/exports 配置文件内容错误， 导致nfs服务器无法穹顶
 因为改了/etc/exports这个服务配置文件， 向让配置生效， 需要重启nfs服务， restart启动， 就先stop, 后start的方式启动;
 
@@ -52,4 +63,6 @@ $ sudo /etc/init.d/nfs-kernel-server status
  Dec 30 22:55:45 docker-app systemd[1]: nfs-server.service: Failed with result 'exit-code'.
  Dec 30 22:55:45 docker-app systemd[1]: Stopped NFS server and services.
  Hint: Some lines were ellipsized, use -l to show in full.
-看到错误原因： exportfs: /etc/exports:2: unknown keyword "inseruce"， 这是笔误， 改成insecure, 在启动服务， 服务就能正常启动了
+看到错误原因： exportfs: /etc/exports:2: unknown keyword "inseruce"， 这是笔误， 改成insecure, 在启动服务，服务就能正常启动了。
+
+网络文件系统nfs正常可用后, 才可以去创建pv, pvc.
