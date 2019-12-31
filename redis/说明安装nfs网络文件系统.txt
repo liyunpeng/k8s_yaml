@@ -1,0 +1,28 @@
+pvc 依赖于pv， pv依赖于nfs文件系统， 
+在建立pv， pvc之前，要确保k8s的每台主机都能正常挂再nfs文件系统， 即第一目标是;
+nfs文件系统建立在192.168.0.211主机下， 
+其他每台主机挂载;
+$ mount -t nfs 192.168.0.211:/usr/local/k8s/redis/pv1  ./a
+向本地目录a,touch一个文件， 到192.168.0.211主机下的/usr/local/k8s/redis/pv1目录下能看到这个文件。 就说明成功
+
+nfs文件系统的配置写好后, 就可以启动nfs服务..    遇到了三个问题，  其他主机安装nfs客户端，配置文件没写对，作为nfs文件系统的/usr/local/k8s/redis/ 没有给其他用户写的权限。
+细说这三个问题：
+1.  mount -t nfs 不能执行
+原因是安装nfs客户端， 需要安装nfs客户端
+另外因为k8s在调度时， 可能会调度到任何主机上， 所以每台主机都要安装nfs， pod在使用pvc时， 会去这个客户端挂载nfs文件系统。 
+解决办法：
+集群里每台主机运行：
+sudo apt-get install nfs-common, 安装nfs客户端
+
+2.  nfs的配置文件/etc/exports里的内容错误， 导致其他主机无权挂载这个文件系统
+/usr/local/k8s/redis/pv1 192.168.0.211 (rw,sync,no_root_squash)
+表示只能被192.168.0.211这个ip地址的主机挂载， 
+解决办法; 
+上面改为：
+/usr/local/k8s/redis/pv1 *(rw,sync,no_root_squash)
+才能被其他主机挂载。 
+
+3.  挂载之后，不能写文件：
+到/usr/local/k8s/redis目下，将所有子文件夹该为777权限
+user@ /usr/local/k8s/redis$ sudo chmod 777 *
+第一目标实现后， 在去创建pv, pvc, 
