@@ -1,8 +1,8 @@
-
 #!/bin/bash
+set -v
 echo "Start"
  
-export IP_ADDR=$(ip addr show enp0s8 | grep -Po 'inet \K[\d.]+')
+export IP_ADDR=$(ip addr show ens33 | grep -Po 'inet \K[\d.]+')
 echo $IP_ADDR
  
 sudo su - << FOE
@@ -125,4 +125,4 @@ done
 # Taint master node
 kubectl taint nodes --all node-role.kubernetes.io/master-
  
-echo "Complete
+echo "Complete"
