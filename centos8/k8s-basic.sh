@@ -89,3 +89,10 @@ EOF
 sudo dnf install -y kubeadm kubectl kubelet
 sudo systemctl enable kubelet
  
+FOE
+ 
+# Add User to docker group
+sudo usermod -a -G docker $(id -nu)
+ 
+ 
+echo "Complete"
