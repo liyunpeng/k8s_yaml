@@ -1,0 +1,438 @@
+[master@bogon centos8]$ k describe po calico-node-kbvvj -n=kube-system
+Name:                 calico-node-kbvvj
+Namespace:            kube-system
+Priority:             2000001000
+Priority Class Name:  system-node-critical
+Node:                 68-node/192.168.0.68
+Start Time:           Wed, 01 Jan 2020 18:57:29 +0800
+Labels:               controller-revision-hash=7bd847c64f
+                      k8s-app=calico-node
+                      pod-template-generation=1
+Annotations:          scheduler.alpha.kubernetes.io/critical-pod:
+Status:               Running
+IP:                   192.168.0.68
+IPs:
+  IP:           192.168.0.68
+Controlled By:  DaemonSet/calico-node
+Init Containers:
+  upgrade-ipam:
+    Container ID:  docker://b77fb3c5d72469ec997def3fa6fd9b89ceb54eed70f22aef3ffaeab6ab2e2838
+    Image:         calico/cni:v3.10.2
+    Image ID:      docker-pullable://calico/cni@sha256:7e7a7ecdb6c14342cc7e1dd231df7f261419dee79c012f031c8c66521b801714
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /opt/cni/bin/calico-ipam
+      -upgrade
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Wed, 01 Jan 2020 18:57:34 +0800
+      Finished:     Wed, 01 Jan 2020 18:57:35 +0800
+    Ready:          True
+    Restart Count:  0
+    Environment:
+      KUBERNETES_NODE_NAME:        (v1:spec.nodeName)
+      CALICO_NETWORKING_BACKEND:  <set to the key 'calico_backend' of config map 'calico-config'>  Optional: false
+    Mounts:
+      /host/opt/cni/bin from cni-bin-dir (rw)
+      /var/lib/cni/networks from host-local-net-dir (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from calico-node-token-k9r2h (ro)
+  install-cni:
+    Container ID:  docker://c5a93359c5489c3ba0807b6974c232f484f31142fdb025eabeff43855b961abd
+    Image:         calico/cni:v3.10.2
+    Image ID:      docker-pullable://calico/cni@sha256:7e7a7ecdb6c14342cc7e1dd231df7f261419dee79c012f031c8c66521b801714
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /install-cni.sh
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Wed, 01 Jan 2020 18:57:40 +0800
+      Finished:     Wed, 01 Jan 2020 18:57:52 +0800
+    Ready:          True
+    Restart Count:  0
+    Environment:
+      CNI_CONF_NAME:         10-calico.conflist
+      CNI_NETWORK_CONFIG:    <set to the key 'cni_network_config' of config map 'calico-config'>  Optional: false
+      KUBERNETES_NODE_NAME:   (v1:spec.nodeName)
+      CNI_MTU:               <set to the key 'veth_mtu' of config map 'calico-config'>  Optional: false
+      SLEEP:                 false
+    Mounts:
+      /host/etc/cni/net.d from cni-net-dir (rw)
+      /host/opt/cni/bin from cni-bin-dir (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from calico-node-token-k9r2h (ro)
+  flexvol-driver:
+    Container ID:   docker://711cb23fb05115e89f70634d3f16dc4ff8612a76e060189a108390e7160abb21
+    Image:          calico/pod2daemon-flexvol:v3.10.2
+    Image ID:       docker-pullable://calico/pod2daemon-flexvol@sha256:c99e3e20083902d79fb3aeb5c7cb634c9b32640ca00d38da452e858a7717a80d
+    Port:           <none>
+    Host Port:      <none>
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Wed, 01 Jan 2020 18:57:56 +0800
+      Finished:     Wed, 01 Jan 2020 18:57:57 +0800
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /host/driver from flexvol-driver-host (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from calico-node-token-k9r2h (ro)
+Containers:
+  calico-node:
+    Container ID:   docker://4a3ad8c9ead89e8d02bc50a1a1591c3cedcd76ff5dabdf6dbd3bfd5359ae4b18
+    Image:          calico/node:v3.10.2
+    Image ID:       docker-pullable://calico/node@sha256:0a16ddf391c06e065c5b4db75069da9e153f9fc9dd45f92ff64a55616e0bfe26
+    Port:           <none>
+    Host Port:      <none>
+    State:          Waiting
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Wed, 01 Jan 2020 19:01:03 +0800
+      Finished:     Wed, 01 Jan 2020 19:01:04 +0800
+    Ready:          False
+    Restart Count:  5
+    Requests:
+      cpu:      250m
+    Liveness:   exec [/bin/calico-node -felix-live -bird-live] delay=10s timeout=1s period=10s #success=1 #failure=6
+    Readiness:  exec [/bin/calico-node -felix-ready -bird-ready] delay=0s timeout=1s period=10s #success=1 #failure=3
+    Environment:
+      DATASTORE_TYPE:                     kubernetes
+      WAIT_FOR_DATASTORE:                 true
+      NODENAME:                            (v1:spec.nodeName)
+      CALICO_NETWORKING_BACKEND:          <set to the key 'calico_backend' of config map 'calico-config'>  Optional: false
+      CLUSTER_TYPE:                       k8s,bgp
+      IP:                                 autodetect
+      CALICO_IPV4POOL_IPIP:               Always
+      FELIX_IPINIPMTU:                    <set to the key 'veth_mtu' of config map 'calico-config'>  Optional: false
+      CALICO_IPV4POOL_CIDR:               192.168.0.0/16
+      CALICO_DISABLE_FILE_LOGGING:        true
+      FELIX_DEFAULTENDPOINTTOHOSTACTION:  ACCEPT
+      FELIX_IPV6SUPPORT:                  false
+      FELIX_LOGSEVERITYSCREEN:            info
+      FELIX_HEALTHENABLED:                true
+    Mounts:
+      /lib/modules from lib-modules (ro)
+      /run/xtables.lock from xtables-lock (rw)
+      /var/lib/calico from var-lib-calico (rw)
+      /var/run/calico from var-run-calico (rw)
+      /var/run/nodeagent from policysync (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from calico-node-token-k9r2h (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             False
+  ContainersReady   False
+  PodScheduled      True
+Volumes:
+  lib-modules:
+    Type:          HostPath (bare host directory volume)
+    Path:          /lib/modules
+    HostPathType:
+  var-run-calico:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/run/calico
+    HostPathType:
+  var-lib-calico:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/lib/calico
+    HostPathType:
+  xtables-lock:
+    Type:          HostPath (bare host directory volume)
+    Path:          /run/xtables.lock
+    HostPathType:  FileOrCreate
+  cni-bin-dir:
+    Type:          HostPath (bare host directory volume)
+    Path:          /opt/cni/bin
+    HostPathType:
+  cni-net-dir:
+    Type:          HostPath (bare host directory volume)
+    Path:          /etc/cni/net.d
+    HostPathType:
+  host-local-net-dir:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/lib/cni/networks
+    HostPathType:
+  policysync:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/run/nodeagent
+    HostPathType:  DirectoryOrCreate
+  flexvol-driver-host:
+    Type:          HostPath (bare host directory volume)
+    Path:          /usr/libexec/kubernetes/kubelet-plugins/volume/exec/nodeagent~uds
+    HostPathType:  DirectoryOrCreate
+  calico-node-token-k9r2h:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  calico-node-token-k9r2h
+    Optional:    false
+QoS Class:       Burstable
+Node-Selectors:  beta.kubernetes.io/os=linux
+Tolerations:     :NoSchedule
+                 :NoExecute
+                 CriticalAddonsOnly
+                 node.kubernetes.io/disk-pressure:NoSchedule
+                 node.kubernetes.io/memory-pressure:NoSchedule
+                 node.kubernetes.io/network-unavailable:NoSchedule
+                 node.kubernetes.io/not-ready:NoExecute
+                 node.kubernetes.io/pid-pressure:NoSchedule
+                 node.kubernetes.io/unreachable:NoExecute
+                 node.kubernetes.io/unschedulable:NoSchedule
+Events:
+  Type     Reason     Age                    From               Message
+  ----     ------     ----                   ----               -------
+  Normal   Scheduled  5m                     default-scheduler  Successfully assigned kube-system/calico-node-kbvvj to 68-node
+  Normal   Pulled     4m57s                  kubelet, 68-node   Container image "calico/cni:v3.10.2" already present on machine
+  Normal   Created    4m56s                  kubelet, 68-node   Created container upgrade-ipam
+  Normal   Started    4m54s                  kubelet, 68-node   Started container upgrade-ipam
+  Normal   Pulled     4m52s                  kubelet, 68-node   Container image "calico/cni:v3.10.2" already present on machine
+  Normal   Created    4m50s                  kubelet, 68-node   Created container install-cni
+  Normal   Started    4m49s                  kubelet, 68-node   Started container install-cni
+  Normal   Created    4m34s                  kubelet, 68-node   Created container flexvol-driver
+  Normal   Pulled     4m34s                  kubelet, 68-node   Container image "calico/pod2daemon-flexvol:v3.10.2" already present on machine
+  Normal   Started    4m32s                  kubelet, 68-node   Started container flexvol-driver
+  Normal   Started    4m6s (x3 over 4m30s)   kubelet, 68-node   Started container calico-node
+  Warning  BackOff    3m47s (x5 over 4m23s)  kubelet, 68-node   Back-off restarting failed container
+  Normal   Pulled     3m36s (x4 over 4m31s)  kubelet, 68-node   Container image "calico/node:v3.10.2" already present on machine
+  Normal   Created    3m36s (x4 over 4m31s)  kubelet, 68-node   Created container calico-node
+
+
+
+[master@bogon centos8]$ k logs po calico-node-kbvvj -n=kube-system
+Error from server (NotFound): pods "po" not found
+[master@bogon centos8]$ k logs calico-node-kbvvj -n=kube-system
+2020-01-01 11:03:52.532 [INFO][8] startup.go 259: Early log level set to info
+2020-01-01 11:03:52.532 [INFO][8] startup.go 275: Using NODENAME environment for node name
+2020-01-01 11:03:52.533 [INFO][8] startup.go 287: Determined node name: 68-node
+2020-01-01 11:03:52.535 [INFO][8] k8s.go 228: Using Calico IPAM
+2020-01-01 11:03:52.535 [INFO][8] startup.go 319: Checking datastore connection
+2020-01-01 11:03:52.550 [INFO][8] startup.go 343: Datastore connection verified
+2020-01-01 11:03:52.550 [INFO][8] startup.go 98: Datastore is ready
+2020-01-01 11:03:52.564 [INFO][8] startup.go 385: Initialize BGP data
+2020-01-01 11:03:52.565 [INFO][8] startup.go 621: Using autodetected IPv4 address on interface cni0: 10.88.0.1/16
+2020-01-01 11:03:52.565 [INFO][8] startup.go 455: Node IPv4 changed, will check for conflicts
+2020-01-01 11:03:52.574 [WARNING][8] startup.go 943: Calico node '214-node' is already using the IPv4 address 10.88.0.1.
+2020-01-01 11:03:52.574 [INFO][8] startup.go 213: Clearing out-of-date IPv4 address from this node IP="10.88.0.1/16"
+[master@bogon centos8]$ k get po -n=kube-system -owide
+NAME                                       READY   STATUS             RESTARTS   AGE     IP              NODE       NOMINATED NODE   READINESS GATES
+calico-kube-controllers-74c9747c46-fwhtq   1/1     Running            0          10m     192.168.29.3    bogon      <none>           <none>
+calico-node-hx95t                          0/1     Running            0          10m     192.168.0.212   bogon      <none>           <none>
+calico-node-hzsgt                          0/1     Running            0          8m39s   192.168.0.214   214-node   <none>           <none>
+calico-node-kbvvj                          0/1     CrashLoopBackOff   6          6m43s   192.168.0.68    68-node    <none>           <none>
+coredns-9d85f5447-2hw5f        2020-01-01 11:03:52.588 [WARNING][8] startup.go 1122: Terminating
+
+
+
+[master@bogon centos8]$ k describe po calico-node-kbvvj -n=kube-system
+Error from server (NotFound): pods "calico-node-kbvvj" not found
+
+
+
+[centos2@213-node ~]$  sudo kubeadm join 192.168.0.212:6443 --token kbz6ax.qht1g7q6qoocky3y     --discovery-token-ca-cert-hash sha256:2c9d11fddf43036482b5c7b503aa8ea83e90074b4846caac17f1b77f9684cf48
+
+[master@bogon service]$ k get po -n=kube-system  -owide
+NAME                                       READY   STATUS              RESTARTS   AGE    IP              NODE       NOMINATED NODE   READINESS GATES
+calico-kube-controllers-74c9747c46-fwhtq   1/1     Running             0          109m   192.168.29.3    bogon      <none>           <none>
+calico-node-cmd7b                          0/1     Init:0/3            0          76s    192.168.0.213   213-node   <none>           <none>
+
+
+
+[master@bogon service]$ k describe po calico-node-hx95t -n=kube-system
+Name:                 calico-node-hx95t
+Namespace:            kube-system
+Priority:             2000001000
+Priority Class Name:  system-node-critical
+Node:                 bogon/192.168.0.212
+Start Time:           Wed, 01 Jan 2020 18:53:46 +0800
+Labels:               controller-revision-hash=7bd847c64f
+                      k8s-app=calico-node
+                      pod-template-generation=1
+Annotations:          scheduler.alpha.kubernetes.io/critical-pod:
+Status:               Running
+IP:                   192.168.0.212
+IPs:
+  IP:           192.168.0.212
+Controlled By:  DaemonSet/calico-node
+Init Containers:
+  upgrade-ipam:
+    Container ID:  docker://b78e5e3a91810cd18a6597ba1b7f20bb870671582211a3b85a996569f4de15bd
+    Image:         calico/cni:v3.10.2
+    Image ID:      docker-pullable://calico/cni@sha256:7e7a7ecdb6c14342cc7e1dd231df7f261419dee79c012f031c8c66521b801714
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /opt/cni/bin/calico-ipam
+      -upgrade
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Wed, 01 Jan 2020 18:53:47 +0800
+      Finished:     Wed, 01 Jan 2020 18:53:47 +0800
+    Ready:          True
+    Restart Count:  0
+    Environment:
+      KUBERNETES_NODE_NAME:        (v1:spec.nodeName)
+      CALICO_NETWORKING_BACKEND:  <set to the key 'calico_backend' of config map 'calico-config'>  Optional: false
+    Mounts:
+      /host/opt/cni/bin from cni-bin-dir (rw)
+      /var/lib/cni/networks from host-local-net-dir (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from calico-node-token-k9r2h (ro)
+  install-cni:
+    Container ID:  docker://51ae0f6c3567062afe4d09cf6a598681e185a4e809c185c35e7c71a3344618a4
+    Image:         calico/cni:v3.10.2
+    Image ID:      docker-pullable://calico/cni@sha256:7e7a7ecdb6c14342cc7e1dd231df7f261419dee79c012f031c8c66521b801714
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /install-cni.sh
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Wed, 01 Jan 2020 18:53:48 +0800
+      Finished:     Wed, 01 Jan 2020 18:53:49 +0800
+    Ready:          True
+    Restart Count:  0
+    Environment:
+      CNI_CONF_NAME:         10-calico.conflist
+      CNI_NETWORK_CONFIG:    <set to the key 'cni_network_config' of config map 'calico-config'>  Optional: false
+      KUBERNETES_NODE_NAME:   (v1:spec.nodeName)
+      CNI_MTU:               <set to the key 'veth_mtu' of config map 'calico-config'>  Optional: false
+      SLEEP:                 false
+    Mounts:
+      /host/etc/cni/net.d from cni-net-dir (rw)
+      /host/opt/cni/bin from cni-bin-dir (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from calico-node-token-k9r2h (ro)
+  flexvol-driver:
+    Container ID:   docker://abe360c7dee966f0f6ab73c42c4cdbe1fa2de78f11693780cb401621dc0f53de
+    Image:          calico/pod2daemon-flexvol:v3.10.2
+    Image ID:       docker-pullable://calico/pod2daemon-flexvol@sha256:c99e3e20083902d79fb3aeb5c7cb634c9b32640ca00d38da452e858a7717a80d
+    Port:           <none>
+    Host Port:      <none>
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Wed, 01 Jan 2020 18:53:49 +0800
+      Finished:     Wed, 01 Jan 2020 18:53:49 +0800
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /host/driver from flexvol-driver-host (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from calico-node-token-k9r2h (ro)
+Containers:
+  calico-node:
+    Container ID:   docker://ff24ed91cb19f2842ba9c61f7f7ded890b3c3ff1e0c1792eada196cd0b03417d
+    Image:          calico/node:v3.10.2
+    Image ID:       docker-pullable://calico/node@sha256:0a16ddf391c06e065c5b4db75069da9e153f9fc9dd45f92ff64a55616e0bfe26
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Wed, 01 Jan 2020 18:53:50 +0800
+    Ready:          False
+    Restart Count:  0
+    Requests:
+      cpu:      250m
+    Liveness:   exec [/bin/calico-node -felix-live -bird-live] delay=10s timeout=1s period=10s #success=1 #failure=6
+    Readiness:  exec [/bin/calico-node -felix-ready -bird-ready] delay=0s timeout=1s period=10s #success=1 #failure=3
+    Environment:
+      DATASTORE_TYPE:                     kubernetes
+      WAIT_FOR_DATASTORE:                 true
+      NODENAME:                            (v1:spec.nodeName)
+      CALICO_NETWORKING_BACKEND:          <set to the key 'calico_backend' of config map 'calico-config'>  Optional: false
+      CLUSTER_TYPE:                       k8s,bgp
+      IP:                                 autodetect
+      CALICO_IPV4POOL_IPIP:               Always
+      FELIX_IPINIPMTU:                    <set to the key 'veth_mtu' of config map 'calico-config'>  Optional: false
+      CALICO_IPV4POOL_CIDR:               192.168.0.0/16
+      CALICO_DISABLE_FILE_LOGGING:        true
+      FELIX_DEFAULTENDPOINTTOHOSTACTION:  ACCEPT
+      FELIX_IPV6SUPPORT:                  false
+      FELIX_LOGSEVERITYSCREEN:            info
+      FELIX_HEALTHENABLED:                true
+    Mounts:
+      /lib/modules from lib-modules (ro)
+      /run/xtables.lock from xtables-lock (rw)
+      /var/lib/calico from var-lib-calico (rw)
+      /var/run/calico from var-run-calico (rw)
+      /var/run/nodeagent from policysync (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from calico-node-token-k9r2h (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             False
+  ContainersReady   False
+  PodScheduled      True
+Volumes:
+  lib-modules:
+    Type:          HostPath (bare host directory volume)
+    Path:          /lib/modules
+    HostPathType:
+  var-run-calico:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/run/calico
+    HostPathType:
+  var-lib-calico:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/lib/calico
+    HostPathType:
+  xtables-lock:
+    Type:          HostPath (bare host directory volume)
+    Path:          /run/xtables.lock
+    HostPathType:  FileOrCreate
+  cni-bin-dir:
+    Type:          HostPath (bare host directory volume)
+    Path:          /opt/cni/bin
+    HostPathType:
+  cni-net-dir:
+    Type:          HostPath (bare host directory volume)
+    Path:          /etc/cni/net.d
+    HostPathType:
+  host-local-net-dir:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/lib/cni/networks
+    HostPathType:
+  policysync:
+    Type:          HostPath (bare host directory volume)
+    Path:          /var/run/nodeagent
+    HostPathType:  DirectoryOrCreate
+  flexvol-driver-host:
+    Type:          HostPath (bare host directory volume)
+    Path:          /usr/libexec/kubernetes/kubelet-plugins/volume/exec/nodeagent~uds
+    HostPathType:  DirectoryOrCreate
+  calico-node-token-k9r2h:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  calico-node-token-k9r2h
+    Optional:    false
+QoS Class:       Burstable
+Node-Selectors:  beta.kubernetes.io/os=linux
+Tolerations:     :NoSchedule
+                 :NoExecute
+                 CriticalAddonsOnly
+                 node.kubernetes.io/disk-pressure:NoSchedule
+                 node.kubernetes.io/memory-pressure:NoSchedule
+                 node.kubernetes.io/network-unavailable:NoSchedule
+                 node.kubernetes.io/not-ready:NoExecute
+                 node.kubernetes.io/pid-pressure:NoSchedule
+                 node.kubernetes.io/unreachable:NoExecute
+                 node.kubernetes.io/unschedulable:NoSchedule
+Events:
+  Type     Reason     Age                   From            Message
+  ----     ------     ----                  ----            -------
+  Warning  Unhealthy  21s (x700 over 116m)  kubelet, bogon  (combined from similar events): Readiness probe failed: calico/node is not ready: BIRD is not ready: BGP not established with 10.88.0.12020-01-01 12:53:55.038 [INFO][24651] health.go 156: Number of node(s) with BGP peering established =
+
+
+创建集群时用的是 --pod-network-cidr=10.244.0.0/16 （当时准备使用Flannel），现在想改为 --pod-network-cidr=192.168.0.0/16 （现在准备使用Calico），请问在不重建集群的情况下如何修改？
+
+k8sdudu的主页dudu | 高人七级 | 园豆：40252
+提问于：2019-12-17 16:19
+< > 找找看分享
+最佳答案
+0
+通过 github 上的这个神方法搞定，打开下面的2个配置，将 10.244.0.0/16 改为 192.168.0.0/16
+1）kubectl -n kube-system edit cm kubeadm-config
+2）vim /etc/kubernetes/manifests/kube-scheduler.yaml
+
+通过 kubectl cluster-info dump | grep -m 1 cluster-cidr 命令可以检查配置是否生效
