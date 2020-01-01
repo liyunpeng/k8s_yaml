@@ -8,7 +8,7 @@ echo $IP_ADDR
 sudo su - << FOE
  
 # Create Kubernetes Cluster
-kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=$IP_ADDR --kubernetes-version stable-1.16 --ignore-preflight-errors=Swap --image-repository registry.aliyuncs.com/google_containers
+kubeadm init --pod-network-cidr=192.169.0.0/16 --apiserver-advertise-address=$IP_ADDR --kubernetes-version stable-1.16 --ignore-preflight-errors=Swap --image-repository registry.aliyuncs.com/google_containers
  
 FOE
  
