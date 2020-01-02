@@ -1,0 +1,81 @@
+用命令进入在线编辑
+[centos5@68-node samba]$ kubectl edit configmap kube-proxy -n kube-system
+这样就进入了在线编辑模式：
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+data:
+  config.conf: |-
+    apiVersion: kubeproxy.config.k8s.io/v1alpha1
+    bindAddress: 0.0.0.0
+    clientConnection:
+      acceptContentTypes: ""
+      burst: 0
+      contentType: ""
+      kubeconfig: /var/lib/kube-proxy/kubeconfig.conf
+      qps: 0
+    clusterCIDR: 192.169.0.0/16
+    configSyncPeriod: 0s
+    conntrack:
+      maxPerCore: null
+      min: null
+      tcpCloseWaitTimeout: null
+      tcpEstablishedTimeout: null
+    enableProfiling: false
+    healthzBindAddress: ""
+    hostnameOverride: ""
+    iptables:
+      masqueradeAll: false
+      masqueradeBit: null
+      minSyncPeriod: 0s
+      syncPeriod: 0s
+    ipvs:
+      excludeCIDRs: null
+      minSyncPeriod: 0s
+      scheduler: ""
+      strictARP: false
+      syncPeriod: 0s
+    kind: KubeProxyConfiguration
+    metricsBindAddress: ""
+    mode: ""    #由“”改为 “ipvs”
+    nodePortAddresses: null
+    oomScoreAdj: null
+configmap/kube-proxy edited
+
+因为要让ipvs的修改生效， 需要删除所有kube-proxy ,  每个node上都对应有一个kube-proxy， 每个kube-proxy被删除后，  kube-proxy会自动重新创建
+[centos5@68-node samba]$ kubectl get pod -n kube-system | grep kube-proxy | awk '{system("kubectl delete pod "$1" -n kube-system")}'
+pod "kube-proxy-b58zn" deleted
+pod "kube-proxy-gwpnn" deleted
+pod "kube-proxy-xs8f6" deleted
+pod "kube-proxy-zq7bm" deleted
+
+kube-proxy delete后， kube-proxy会自动重新创建,  再看下所有的k8s系统pod
+[centos5@68-node samba]$ k get po -n=kube-system
+NAME                                       READY   STATUS    RESTARTS   AGE
+calico-kube-controllers-74c9747c46-w5268   1/1     Running   0          107m
+calico-node-6cgbt                          1/1     Running   0          96m
+calico-node-hrll6                          1/1     Running   0          93m
+calico-node-nvmxg                          1/1     Running   0          101m
+calico-node-t9z6p                          0/1     Running   0          107m
+coredns-9d85f5447-kj6jm                    1/1     Running   0          107m
+coredns-9d85f5447-znqs4                    1/1     Running   0          107m
+etcd-68-node                               1/1     Running   0          107m
+kube-apiserver-68-node                     1/1     Running   0          107m
+kube-controller-manager-68-node            1/1     Running   0          107m
+kube-flannel-ds-amd64-895zp                1/1     Running   0          96m
+kube-flannel-ds-amd64-kt54v                1/1     Running   0          107m
+kube-flannel-ds-amd64-kvcqh                1/1     Running   0          101m
+kube-flannel-ds-amd64-pv55q                1/1     Running   0          93m
+kube-proxy-fc487                           1/1     Running   0          20s
+kube-proxy-ffpjg                           1/1     Running   0          31s
+kube-proxy-l75w6                           1/1     Running   0          24s
+kube-proxy-lpnkd                           1/1     Running   0          6s
+kube-scheduler-68-node                     1/1     Running   0          107m
+
+kube-proxy 重新创建后， 应用pod 正常运行：
+[centos5@68-node samba]$ k get po -owide
+NAME                     READY   STATUS    RESTARTS   AGE   IP             NODE    NOMINATED NODE   READINESS GATES
+nginx-86c57db685-rjq2x   1/1     Running   0          64m   192.168.29.1   bogon   <none>           <none>
+rc-tomcat-rzs9x          1/1     Running   0          63m   192.168.29.2   bogon   <none>           <none>
