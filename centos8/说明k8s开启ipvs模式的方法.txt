@@ -39,7 +39,7 @@ data:
       syncPeriod: 0s
     kind: KubeProxyConfiguration
     metricsBindAddress: ""
-    mode: ""    #由“”改为 “ipvs”
+    mode: ""    # 将""改为 "ipvs"， 即开启了ipvs模式， 之后需要重启每个节点的kube-proxy
     nodePortAddresses: null
     oomScoreAdj: null
 configmap/kube-proxy edited
