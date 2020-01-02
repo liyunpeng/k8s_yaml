@@ -1,0 +1,152 @@
+
+echo "Start"
+Start
+ 
+export IP_ADDR=$(ip addr show ens33 | grep -Po 'inet \K[\d.]+')
+Device "ens33" does not exist.
+echo $IP_ADDR
+
+ 
+sudo su - << FOE
+ 
+# Create Kubernetes Cluster
+kubeadm init --pod-network-cidr=192.169.0.0/16 --apiserver-advertise-address=$IP_ADDR --kubernetes-version stable-1.16 --ignore-preflight-errors=Swap --image-repository registry.aliyuncs.com/google_containers  
+ 
+FOE
+W0102 08:50:57.168240   18110 version.go:101] could not fetch a Kubernetes version from the internet: unable to get URL "https://dl.k8s.io/release/stable-1.16.txt": Get https://dl.k8s.io/release/stable-1.16.txt: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)
+W0102 08:50:57.168357   18110 version.go:102] falling back to the local client version: v1.17.0
+W0102 08:50:57.168480   18110 validation.go:28] Cannot validate kube-proxy config - no validator is available
+W0102 08:50:57.168493   18110 validation.go:28] Cannot validate kubelet config - no validator is available
+[init] Using Kubernetes version: v1.17.0
+[preflight] Running pre-flight checks
+	[WARNING Swap]: running with swap on is not supported. Please disable swap
+[preflight] Pulling images required for setting up a Kubernetes cluster
+[preflight] This might take a minute or two, depending on the speed of your internet connection
+[preflight] You can also perform this action in beforehand using 'kubeadm config images pull'
+[kubelet-start] Writing kubelet environment file with flags to file "/var/lib/kubelet/kubeadm-flags.env"
+[kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+[kubelet-start] Starting the kubelet
+[certs] Using certificateDir folder "/etc/kubernetes/pki"
+[certs] Generating "ca" certificate and key
+[certs] Generating "apiserver" certificate and key
+[certs] apiserver serving cert is signed for DNS names [68-node kubernetes kubernetes.default kubernetes.default.svc kubernetes.default.svc.cluster.local] and IPs [10.96.0.1 192.168.0.68]
+[certs] Generating "apiserver-kubelet-client" certificate and key
+[certs] Generating "front-proxy-ca" certificate and key
+[certs] Generating "front-proxy-client" certificate and key
+[certs] Generating "etcd/ca" certificate and key
+[certs] Generating "etcd/server" certificate and key
+[certs] etcd/server serving cert is signed for DNS names [68-node localhost] and IPs [192.168.0.68 127.0.0.1 ::1]
+[certs] Generating "etcd/peer" certificate and key
+[certs] etcd/peer serving cert is signed for DNS names [68-node localhost] and IPs [192.168.0.68 127.0.0.1 ::1]
+[certs] Generating "etcd/healthcheck-client" certificate and key
+[certs] Generating "apiserver-etcd-client" certificate and key
+[certs] Generating "sa" key and public key
+[kubeconfig] Using kubeconfig folder "/etc/kubernetes"
+[kubeconfig] Writing "admin.conf" kubeconfig file
+[kubeconfig] Writing "kubelet.conf" kubeconfig file
+[kubeconfig] Writing "controller-manager.conf" kubeconfig file
+[kubeconfig] Writing "scheduler.conf" kubeconfig file
+[control-plane] Using manifest folder "/etc/kubernetes/manifests"
+[control-plane] Creating static Pod manifest for "kube-apiserver"
+[control-plane] Creating static Pod manifest for "kube-controller-manager"
+W0102 08:51:12.225652   18110 manifests.go:214] the default kube-apiserver authorization-mode is "Node,RBAC"; using "Node,RBAC"
+[control-plane] Creating static Pod manifest for "kube-scheduler"
+W0102 08:51:12.228760   18110 manifests.go:214] the default kube-apiserver authorization-mode is "Node,RBAC"; using "Node,RBAC"
+[etcd] Creating static Pod manifest for local etcd in "/etc/kubernetes/manifests"
+[wait-control-plane] Waiting for the kubelet to boot up the control plane as static Pods from directory "/etc/kubernetes/manifests". This can take up to 4m0s
+[kubelet-check] Initial timeout of 40s passed.
+[apiclient] All control plane components are healthy after 44.502580 seconds
+[upload-config] Storing the configuration used in ConfigMap "kubeadm-config" in the "kube-system" Namespace
+[kubelet] Creating a ConfigMap "kubelet-config-1.17" in namespace kube-system with the configuration for the kubelets in the cluster
+[upload-certs] Skipping phase. Please see --upload-certs
+[mark-control-plane] Marking the node 68-node as control-plane by adding the label "node-role.kubernetes.io/master=''"
+[mark-control-plane] Marking the node 68-node as control-plane by adding the taints [node-role.kubernetes.io/master:NoSchedule]
+[bootstrap-token] Using token: ruijpp.vqs5krt4ld9cycaa
+[bootstrap-token] Configuring bootstrap tokens, cluster-info ConfigMap, RBAC Roles
+[bootstrap-token] configured RBAC rules to allow Node Bootstrap tokens to post CSRs in order for nodes to get long term certificate credentials
+[bootstrap-token] configured RBAC rules to allow the csrapprover controller automatically approve CSRs from a Node Bootstrap Token
+[bootstrap-token] configured RBAC rules to allow certificate rotation for all node client certificates in the cluster
+[bootstrap-token] Creating the "cluster-info" ConfigMap in the "kube-public" namespace
+[kubelet-finalize] Updating "/etc/kubernetes/kubelet.conf" to point to a rotatable kubelet client certificate and key
+[addons] Applied essential addon: CoreDNS
+[addons] Applied essential addon: kube-proxy
+
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 192.168.0.68:6443 --token ruijpp.vqs5krt4ld9cycaa \
+    --discovery-token-ca-cert-hash sha256:ca2f354a50642e3b846ad533770fc7bc82baf05c4b5f29181cb9c6dd303c1838 
+sleep 10s
+
+# Create .kube folder
+if [ -f $HOME/.kube/config ]; then
+  rm -rf $HOME/.kube/config  
+fi
+ 
+if [ ! -d $HOME/.kube ]; then
+  mkdir $HOME/.kube 
+fi
+ 
+# Copy Kubernetes config file
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config 
+sudo chown $(id -u):$(id -g) $HOME/.kube/config 
+ 
+# Apply network plugin
+result=1
+while [ $result -ne 0 ]
+do
+	kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml 
+	result=$?
+	sleep 10s
+done
+podsecuritypolicy.policy/psp.flannel.unprivileged created
+clusterrole.rbac.authorization.k8s.io/flannel created
+clusterrolebinding.rbac.authorization.k8s.io/flannel created
+serviceaccount/flannel created
+configmap/kube-flannel-cfg created
+daemonset.apps/kube-flannel-ds-amd64 created
+daemonset.apps/kube-flannel-ds-arm64 created
+daemonset.apps/kube-flannel-ds-arm created
+daemonset.apps/kube-flannel-ds-ppc64le created
+daemonset.apps/kube-flannel-ds-s390x created
+kubectl apply -f https://docs.projectcalico.org/v3.10/manifests/calico.yaml 
+configmap/calico-config created
+customresourcedefinition.apiextensions.k8s.io/felixconfigurations.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/ipamblocks.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/blockaffinities.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/ipamhandles.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/ipamconfigs.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/bgppeers.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/bgpconfigurations.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/ippools.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/hostendpoints.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/clusterinformations.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/globalnetworkpolicies.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/globalnetworksets.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/networkpolicies.crd.projectcalico.org created
+customresourcedefinition.apiextensions.k8s.io/networksets.crd.projectcalico.org created
+clusterrole.rbac.authorization.k8s.io/calico-kube-controllers created
+clusterrolebinding.rbac.authorization.k8s.io/calico-kube-controllers created
+clusterrole.rbac.authorization.k8s.io/calico-node created
+clusterrolebinding.rbac.authorization.k8s.io/calico-node created
+daemonset.apps/calico-node created
+serviceaccount/calico-node created
+deployment.apps/calico-kube-controllers created
+serviceaccount/calico-kube-controllers created
+ 
+# Taint master node
+#kubectl taint nodes --all node-role.kubernetes.io/master-
+ 
+echo "Complete"
+Complete

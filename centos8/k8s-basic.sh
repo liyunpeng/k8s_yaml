@@ -1,10 +1,13 @@
 #!/bin/bash
 set -v
 echo "Start"
- 
+
+sudo sed -i '/swap/ s/^/#/' /etc/fstab
+
 export IP_ADDR=$(ip addr show ens33 | grep -Po 'inet \K[\d.]+')
 echo $IP_ADDR
- 
+
+
 sudo su - << FOE
  
 # Stop firewall and selinux

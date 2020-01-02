@@ -18,11 +18,11 @@ Volumes:
     Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
     ClaimName:  data-redis-0
     ReadOnly:   false
-这个就是pod使用的pvc了， 对应的pod yaml文件中的定义：
-volumeMounts:
+这个就是该pod使用的pvc了， 对应的pod yaml文件中的定义：
+        volumeMounts:
             - name: "data"
               mountPath: "/var/lib/redis"
-volumeClaimTemplates:
+    volumeClaimTemplates:
     - metadata:
         name: data
       spec:

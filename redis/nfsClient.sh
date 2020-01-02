@@ -2,4 +2,4 @@
 set -v
 
 apt-get install nfs-utils -y
-showmount -e 192.168.0.211
+showmount -e 192.168.0.214
