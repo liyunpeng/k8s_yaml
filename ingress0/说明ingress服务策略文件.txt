@@ -1,4 +1,5 @@
-ingress 策略定义文件里， kind是ingress,  定义了http的路由转发规则， 就是对不同的url路径转发到不同的后端服务。 以下是完整的策略定义问价
+ingress 策略定义文件中，kind是ingress, 定义了http的路由转发规则，就是对不同的url路径转发到不同的后端服务。
+以下是完整的策略定义文件：
 $ cat  ingress-policy.yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -30,8 +31,7 @@ ingress策略文件的定义清晰易懂，
 所有的路径和后端服务的定义都要放在描述项：
     http:
       paths:
-里面.
-立方放着若干结构一致的组， 每个组包含一个url路径对应的一个后端服务，如;
+里面存放着若干结构一致的组，每个组包含一个url路径和与之对应的一个后端服务：
         - path: /demo
           backend:
             serviceName: myapp-svc

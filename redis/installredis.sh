@@ -17,7 +17,7 @@ deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted unive
 EOF
 
 sudo apt-get update
-sudo gapt-get install -y vim wget python2.7 python-pip redis-tools dnsutils
+sudo apt-get install -y vim wget python2.7 python-pip redis-tools dnsutils
 
 # 安装redis-trib：
 

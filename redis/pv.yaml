@@ -8,7 +8,7 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    server: 192.168.0.211
+    server: 192.168.0.215
     path: "/usr/local/k8s/redis/pv1"
 
 ---
@@ -22,7 +22,7 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    server: 192.168.0.211
+    server: 192.168.0.215
     path: "/usr/local/k8s/redis/pv2"
 
 ---
@@ -36,7 +36,7 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    server: 192.168.0.211
+    server: 192.168.0.215
     path: "/usr/local/k8s/redis/pv3"
 
 ---
@@ -50,7 +50,7 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    server: 192.168.0.211
+    server: 192.168.0.215
     path: "/usr/local/k8s/redis/pv4"
 
 ---
@@ -64,7 +64,7 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    server: 192.168.0.211
+    server: 192.168.0.215
     path: "/usr/local/k8s/redis/pv5"
 
 ---
@@ -78,5 +78,5 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    server: 192.168.0.211
+    server: 192.168.0.215
     path: "/usr/local/k8s/redis/pv6"
