@@ -6,8 +6,6 @@ centos7 解决 Python.h：没有那个文件或目录 错误的方法
 
 sudo yum install python3-devel
 
-
-
 [centos5@68-node pyxattr-0.7.1]$ sudo pip3.6 install pyxattr
 [sudo] centos5 的密码：
 WARNING: Running pip install with root privileges is generally not a good idea. Try `pip3.6 install --user` instead.
