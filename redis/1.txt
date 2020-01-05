@@ -497,3 +497,29 @@ EOF
    10  redis-trib.py replicate   --master-addr `dig +short redis-1.redis-service.default.svc.cluster.local`:6379   --slave-addr `dig +short redis-4.redis-service.default.svc.cluster.local`:6379
    11  redis-trib.py replicate   --master-addr `dig +short redis-2.redis-service.default.svc.cluster.local`:6379   --slave-addr `dig +short redis-5.redis-service.default.svc.cluster.local`:6379
 
+====================================
+[node1@215-node ~]$ sudo systemctl status nfs-server
+[sudo] node1 的密码：
+● nfs-server.service - NFS server and services
+   Loaded: loaded (/usr/lib/systemd/system/nfs-server.service; disabled; vendor preset: disabled)
+  Drop-In: /run/systemd/generator/nfs-server.service.d
+           └─order-with-mounts.conf
+   Active: inactive (dead)
+[node1@215-node ~]$ sudo systemctl start  nfs-server
+[node1@215-node ~]$ sudo systemctl status nfs-server
+● nfs-server.service - NFS server and services
+   Loaded: loaded (/usr/lib/systemd/system/nfs-server.service; disabled; vendor preset: disabled)
+  Drop-In: /run/systemd/generator/nfs-server.service.d
+           └─order-with-mounts.conf
+   Active: active (exited) since Sat 2020-01-04 23:16:46 EST; 1s ago
+  Process: 95867 ExecStart=/bin/sh -c if systemctl -q is-active gssproxy; then systemctl reload gssproxy ; fi (code=exited, stat>
+  Process: 95848 ExecStart=/usr/sbin/rpc.nfsd (code=exited, status=0/SUCCESS)
+  Process: 95846 ExecStartPre=/usr/sbin/exportfs -r (code=exited, status=0/SUCCESS)
+ Main PID: 95867 (code=exited, status=0/SUCCESS)
+
+
+1月 04 23:16:45 215-node systemd[1]: Starting NFS server and services...
+1月 04 23:16:46 215-node systemd[1]: Started NFS server and services.
+
+
+nfs 没有启动， pod redis会error， nfs启动好了， pod Redis会自动变为running, 说明pod redis,一直去尝试挂载

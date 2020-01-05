@@ -1,6 +1,6 @@
 ---
 kind: Deployment
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 metadata:
   name: ykszktest-n1
 spec:
@@ -25,7 +25,7 @@ spec:
       containers:
       - name: ykszktest-n1
         image: zookeeper:3.4.10
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: ykszktest-data
           readOnly: false
@@ -50,7 +50,7 @@ spec:
 
 ---
 kind: Deployment
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 metadata:
   name: ykszktest-n2
 spec:
@@ -75,7 +75,7 @@ spec:
       containers:
       - name: ykszktest-n2
         image: zookeeper:3.4.10
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: ykszktest-data
           readOnly: false
@@ -100,7 +100,7 @@ spec:
 
 ---
 kind: Deployment
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 metadata:
   name: ykszktest-n3
 spec:
@@ -125,7 +125,7 @@ spec:
       containers:
       - name: ykszktest-n3
         image: zookeeper:3.4.10
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: ykszktest-data
           readOnly: false
