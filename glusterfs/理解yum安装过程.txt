@@ -1,5 +1,18 @@
-centos 软件包的安装文件都是rpm文件
-rpm 命令 和 yum命令安装的软件都是rpm文件
+先说yum的前提， repo配置文件
+repo配置文件可以手动下载，也可以直接从远端下载，推荐从远端下载，wget -O 指定了下载文件的本地存放路径，所有的repo文件都要放在/etc/yum.repos.d/目录下，这样才能被rpm, yum识别。
+$ sudo wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-8.repo
+--2020-01-04 03:45:54--  http://mirrors.aliyun.com/repo/Centos-8.repo
+正在解析主机 mirrors.aliyun.com (mirrors.aliyun.com)... 27.221.92.112, 119.167.188.227, 27.221.92.125, ...
+正在连接 mirrors.aliyun.com (mirrors.aliyun.com)|27.221.92.112|:80... 已连接。
+已发出 HTTP 请求，正在等待回应... 200 OK
+长度：2595 (2.5K) [application/octet-stream]
+正在保存至: “/etc/yum.repos.d/CentOS-Base.repo”
+/etc/yum.repos.d/CentOS-Base.repo  100%[================================================================>]   2.53K  --.-KB/s  用时 0s
+2020-01-04 03:45:54 (157 MB/s) - 已保存 “/etc/yum.repos.d/CentOS-Base.repo” [2595/2595])
+
+好了，现在说yum安装. 
+centos软件包的安装文件都是rpm文件
+rpm命令和yum命令都是安装repo配置文件制定的的软件rpm文件
 不同在于：
 rpm命令只会安装指定的rpm文件，
 yum命令会从repo文件里找到软件的具体rpm名字， 并且找到所有这个rpm安装包，所依赖的其他安装包， 简单说就是找出所有依赖
