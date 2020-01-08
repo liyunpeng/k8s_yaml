@@ -27,8 +27,40 @@ $ rpm -i glusterfs-resource-agents-6.6-1.el8.noarch.rpm
 
 所以实际中多是配置好repo文件，用一个yum命令，一键式安装好目标安装包和所有依赖安装包
 
-以glusterfs-server，用实际的例子具体来看一个yum命令包含的所有动作：
+------------------------------------------------------------------------------------------------------------
+以glusterfs-server，记录一下centos8上yum方式安装的正确姿势：
+先配置好repo, 这是yum的依据，决定了软件包的具体详细完整的版本号，和下载地址。
+1. 复制glusterfs官网提供的repo到本地
+cat  << EOF > /etc/yum.repos.d/glusterfs.repo
+[glusterfs-rhel8]
+name=GlusterFS is a clustered file-system capable of scaling to several petabytes.
+baseurl=https://download.gluster.org/pub/gluster/glusterfs/6/LATEST/RHEL/el-$releasever/$basearch/
+enabled=1
+skip_if_unavailable=1
+gpgcheck=1
+gpgkey=https://download.gluster.org/pub/gluster/glusterfs/6/rsa.pub
 
+[glusterfs-noarch-rhel8]
+name=GlusterFS is a clustered file-system capable of scaling to several petabytes.
+baseurl=https://download.gluster.org/pub/gluster/glusterfs/6/LATEST/RHEL/el-$releasever/noarch
+enabled=1
+skip_if_unavailable=1
+gpgcheck=1
+gpgkey=https://download.gluster.org/pub/gluster/glusterfs/6/rsa.pub
+EOF
+这里之所以没选最新版本glusterfs/7，是因为python3-pyxattr这个rpm，没有找到包含这个rpm的repo.
+$ sudo yum install -y glusterfs-server-7.1-1.el8.x86_64
+上次元数据过期检查：0:01:52 前，执行于 2020年01月04日 星期六 12时47分53秒。
+错误：
+ 问题: conflicting requests
+  - nothing provides python3-pyxattr needed by glusterfs-server-7.1-1.el8.x86_64
+(try to add '--skip-broken' to skip uninstallable packages or '--nobest' to use not only best candidate packages)
+
+2. 下载基础repo到本地，这个repo提供了依赖包的明细，包括版本号，下载地址等
+sudo wget -O /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+到此repo就准备好了， 可以一键yum安装了
+
+3. 一键yum安装，借此观察一下yum命令包含的所有动作：
 $ sudo yum install glusterfs-server
 GlusterFS is a clustered file-system capable of scaling to several petabytes.                    3.5 kB/s |  23 kB     00:06
 依赖关系解决。
