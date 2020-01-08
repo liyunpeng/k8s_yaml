@@ -17,7 +17,17 @@ rpm命令和yum命令都是安装repo配置文件制定的的软件rpm文件
 rpm命令只会安装指定的rpm文件，
 yum命令会从repo文件里找到软件的具体rpm名字， 并且找到所有这个rpm安装包，所依赖的其他安装包， 简单说就是找出所有依赖
 然后，依次按依赖顺序，依次安装这些rpm软件包。
-以glusterfs-server， 用实际的例子具体来看这个过程：
+不建议用rpm命令，因为rpm不会去自动去下载依赖的包，自己去找，会麻烦，而且可能不稳定，因为依赖的包又可能依赖其他的包，
+这层层依赖，一个个去手动下载是不合理的。 比如：
+$ rpm -i glusterfs-resource-agents-6.6-1.el8.noarch.rpm
+警告：glusterfs-resource-agents-6.6-1.el8.noarch.rpm: 头V4 RSA/SHA256 Signature, 密钥 ID c2f8238c: NOKEY
+错误：依赖检测失败：
+        /usr/lib/ocf/resource.d 被 glusterfs-resource-agents-6.6-1.el8.noarch 需要
+        glusterfs-server = 6.6-1.el8 被 glusterfs-resource-agents-6.6-1.el8.noarch 需要
+
+所以实际中多是配置好repo文件，用一个yum命令，一键式安装好目标安装包和所有依赖安装包
+
+以glusterfs-server，用实际的例子具体来看一个yum命令包含的所有动作：
 
 $ sudo yum install glusterfs-server
 GlusterFS is a clustered file-system capable of scaling to several petabytes.                    3.5 kB/s |  23 kB     00:06
