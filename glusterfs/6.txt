@@ -1,0 +1,12 @@
+label之后才会被shedule到相应的node上， 因为damonset设置了nodeselector
+[centos-8@216-node glusterfs]$ hostname
+216-node
+[centos-8@216-node glusterfs]$ kubectl label node 216-node  storagenode=glusterfs
+node/216-node labeled
+[centos-8@216-node glusterfs]$  kubectl label node 141-node  storagenode=glusterfs
+node/141-node labeled
+[centos-8@216-node glusterfs]$ k get po
+NAME              READY   STATUS              RESTARTS   AGE
+glusterfs-6b9jh   0/1     ContainerCreating   0          36s
+glusterfs-x594c   0/1     ContainerCreating   0          3s
+
