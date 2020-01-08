@@ -12,7 +12,7 @@ $ sudo wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/
 
 好了，现在说yum安装. 
 centos软件包的安装文件都是rpm文件
-rpm命令和yum命令都是安装repo配置文件制定的的软件rpm文件
+rpm命令和yum命令都是安装repo配置文件指定的的软件rpm文件
 不同在于：
 rpm命令只会安装指定的rpm文件，
 yum命令会从repo文件里找到软件的具体rpm名字， 并且找到所有这个rpm安装包，所依赖的其他安装包， 简单说就是找出所有依赖
