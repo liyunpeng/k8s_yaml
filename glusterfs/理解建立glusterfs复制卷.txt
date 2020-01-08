@@ -49,7 +49,7 @@ Uuid: db4004ba-dd3a-4646-ae63-c731088d762b
 State: Accepted peer request (Connected)
 
 以字段方式列出集群中所有节点：
-
+[centos2@213-node glusterfs]$ sudo gluster peer list
 
 3.  创建一个复制卷
 gluster volume create  <卷名> <主机名:卷目录>  <主机名:卷目录> 
