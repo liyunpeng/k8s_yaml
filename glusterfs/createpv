@@ -3,8 +3,8 @@
 set -v
 pvcreate /dev/sdb1
 vgcreate vg0 /dev/sdb1
-lvcreate -L 8G -T vg0/thinpool
-lvcreate -V 6G -T vg0/thinpool -n datalv
+lvcreate -L 4G -T vg0/thinpool
+lvcreate -V 3G -T vg0/thinpool -n datalv
 
 vgdisplay
 pvdisplay
