@@ -1,0 +1,89 @@
+[user9@217-node ~]$  sudo setsebool -P virt_sandbox_use_fusefs on
+
+
+    [master@212-node gluster-kubernetes]$ echo -n hello | base64
+    aGVsbG8=
+    [master@212-node gluster-kubernetes]$ su root
+    密码：
+    [root@212-node gluster-kubernetes]# ls
+    1.txt  deploy  docs  LICENSE  MAINTAINERS.md  Makefile  README.md  tests  vagrant
+    [root@212-node gluster-kubernetes]# cd
+    [root@212-node ~]# ls
+    anaconda-ks.cfg  initial-setup-ks.cfg
+    [root@212-node ~]# ssh
+    ssh          ssh-add      ssh-agent    ssh-copy-id  sshd         ssh-keygen   ssh-keyscan
+    [root@212-node ~]# ssh-keygen
+    Generating public/private rsa key pair.
+    Enter file in which to save the key (/root/.ssh/id_rsa):
+    Created directory '/root/.ssh'.
+    Enter passphrase (empty for no passphrase):
+    Enter same passphrase again:
+    Your identification has been saved in /root/.ssh/id_rsa.
+    Your public key has been saved in /root/.ssh/id_rsa.pub.
+    The key fingerprint is:
+    SHA256:7sE1caSzHA4UIYj9ld49U5q413jZVYRzIRsMdfarR/c root@212-node
+    The key's randomart image is:
+    +---[RSA 2048]----+
+    |   o .. ++ .=+ *o|
+    |  . o  oo  o .X +|
+    |     . o..=o.= oo|
+    |      . .+o**   o|
+    |        S *. = =o|
+    |       o ...o * +|
+    |        +  . o .E|
+    |       . .    .  |
+    |        .        |
+    +----[SHA256]-----+
+    [root@212-node ~]#
+    [root@212-node ~]# cd /home/master/
+    公共/               文档/               bin/                gluster-kubernetes/ .local/             shell/
+    模板/               下载/               .cache/             k8s/                mnt/                tmp/
+    视频/               音乐/               .config/            k8s_yaml/           .mozilla/           .vim/
+    图片/               桌面/               .dbus/              .kube/              .pki/
+    [root@212-node ~]# cd /home/master/
+    公共/               文档/               bin/                gluster-kubernetes/ .local/             shell/
+    模板/               下载/               .cache/             k8s/                mnt/                tmp/
+    视频/               音乐/               .config/            k8s_yaml/           .mozilla/           .vim/
+    图片/               桌面/               .dbus/              .kube/              .pki/
+    [root@212-node ~]# cd /home/master/gluster-kubernetes/deploy/
+    [root@212-node deploy]# ./gk-deploy --admin-key aGVsbG8= --user-key aGVsbG8=  --ssh-keyfile /root/.ssh/id_rsa
+    Welcome to the deployment tool for GlusterFS on Kubernetes and OpenShift.
+
+    Before getting started, this script has some requirements of the execution
+    environment and of the container platform that you should verify.
+
+    The client machine that will run this script must have:
+     * Administrative access to an existing Kubernetes or OpenShift cluster
+     * Access to a python interpreter 'python'
+
+    Each of the nodes that will host GlusterFS must also have appropriate firewall
+    rules for the required GlusterFS ports:
+     * 2222  - sshd (if running GlusterFS in a pod)
+     * 24007 - GlusterFS Management
+     * 24008 - GlusterFS RDMA
+     * 49152 to 49251 - Each brick for every volume on the host requires its own
+       port. For every new brick, one new port will be used starting at 49152. We
+       recommend a default range of 49152-49251 on each host, though you can adjust
+       this to fit your needs.
+
+    The following kernel modules must be loaded:
+     * dm_snapshot
+     * dm_mirror
+     * dm_thin_pool
+
+    For systems with SELinux, the following settings need to be considered:
+     * virt_sandbox_use_fusefs should be enabled on each node to allow writing to
+       remote GlusterFS volumes
+
+    In addition, for an OpenShift deployment you must:
+     * Have 'cluster_admin' role on the administrative account doing the deployment
+     * Add the 'default' and 'router' Service Accounts to the 'privileged' SCC
+     * Have a router deployed that is configured to allow apps to access services
+       running in the cluster
+
+    Do you wish to proceed with deployment?
+
+    [Y]es, [N]o? [Default: Y]: Y
+    Using Kubernetes CLI.
+    Using namespace "default".
+
