@@ -260,3 +260,109 @@ NAME       STATUS   ROLES    AGE     VERSION
 213-node   Ready    <none>   4h47m   v1.17.0
 217-node   Ready    <none>   4h45m   v1.17.0
 219-node   Ready    <none>   12m     v1.17.0
+
+
+delete 一个node后， 还能看到有pod在这个node上，要过一段时间这个pod才会消失：
+[master@212-node ~]$ k delete no 217-node
+node "217-node" deleted
+[master@212-node ~]$ k get po -owide
+NAME                             READY   STATUS    RESTARTS   AGE   IP               NODE       NOMINATED NODE   READINESS GATES
+deploy-heketi-65d9c564d6-48xkg   1/1     Running   1          16h   192.168.244.66   68-node    <none>           <none>
+glusterfs-4p699                  0/1     Running   120        20h   192.168.0.219    219-node   <none>           <none>
+glusterfs-vhbgn                  1/1     Running   1          24h   192.168.0.217    217-node   <none>           <none>
+[master@212-node ~]$ k get po -owide
+NAME                             READY   STATUS    RESTARTS   AGE   IP               NODE       NOMINATED NODE   READINESS GATES
+deploy-heketi-65d9c564d6-48xkg   1/1     Running   1          16h   192.168.244.66   68-node    <none>           <none>
+glusterfs-4p699                  0/1     Running   120        20h   192.168.0.219    219-node   <none>           <none>
+glusterfs-vhbgn                  1/1     Running   1          24h   192.168.0.217    217-node   <none>           <none>
+[master@212-node ~]$ k get po -owide
+NAME                             READY   STATUS    RESTARTS   AGE   IP               NODE       NOMINATED NODE   READINESS GATES
+deploy-heketi-65d9c564d6-48xkg   1/1     Running   1          16h   192.168.244.66   68-node    <none>           <none>
+glusterfs-4p699                  0/1     Running   120        20h   192.168.0.219    219-node   <none>           <none>
+glusterfs-vhbgn                  1/1     Running   1          24h   192.168.0.217    217-node   <none>           <none>
+[master@212-node ~]$ k get po -owide
+NAME                             READY   STATUS    RESTARTS   AGE   IP               NODE       NOMINATED NODE   READINESS GATES
+deploy-heketi-65d9c564d6-48xkg   1/1     Running   1          16h   192.168.244.66   68-node    <none>           <none>
+glusterfs-4p699                  0/1     Running   120        20h   192.168.0.219    219-node   <none>           <none>
+glusterfs-vhbgn                  1/1     Running   1          24h   192.168.0.217    217-node   <none>           <none>
+[master@212-node ~]$ k get po -owide
+NAME                             READY   STATUS    RESTARTS   AGE   IP               NODE       NOMINATED NODE   READINESS GATES
+deploy-heketi-65d9c564d6-48xkg   1/1     Running   1          16h   192.168.244.66   68-node    <none>           <none>
+glusterfs-4p699                  0/1     Running   120        20h   192.168.0.219    219-node   <none>           <none>
+
+
+
+
+========================
+启动glusterfsd进程， 并没有占用很多的物理内存，
+由
+物理剩余内存=MemFree: 1789280 kB
+变为
+物理剩余内存=MemFree: 1785664 kB
+
+
+[user9@217-node shell]$ cat
+cat        catchsegv  catman
+[user9@217-node shell]$ ./catcpumem.sh
+物理总内存=MemTotal: 3848804 kB
+物理剩余内存=MemFree: 1789280 kB
+内核版本与操作系统=Linux version 4.18.0-80.el8.x86_64 (mockbuild@kbuilder.bsys.centos.org) (gcc version 8.2.1 20180905 (Red Hat 8.2.1-3) (GCC)) #1 SMP Tue Jun 4 09:19:46 UTC 2019
+cpu数目=4
+一个cpu上的核数=cpu cores : 1
+一个cpu上的核数和cpu型号和每个核的频率= 4 Intel(R) Celeron(R) CPU J3455 @ 1.50GHz
+[user9@217-node shell]$ sudo systemctl status gluster
+glusterd.service                glusterfsd.service              glusterfssharedstorage.service
+[user9@217-node shell]$ sudo systemctl status gluster
+glusterd.service                glusterfsd.service              glusterfssharedstorage.service
+[user9@217-node shell]$ sudo systemctl status glusterfs
+glusterfsd.service              glusterfssharedstorage.service
+[user9@217-node shell]$ sudo systemctl status glusterfsd.service `
+> ^C
+[user9@217-node shell]$ sudo systemctl status glusterfsd.service
+[sudo] user9 的密码：
+● glusterfsd.service - GlusterFS brick processes (stopping only)
+   Loaded: loaded (/usr/lib/systemd/system/glusterfsd.service; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+[user9@217-node shell]$ sudo systemctl start glusterfsd.service
+[user9@217-node shell]$ sudo systemctl status glusterfsd.service `^C
+[user9@217-node shell]$ sudo systemctl status glusterfsd.service
+● glusterfsd.service - GlusterFS brick processes (stopping only)
+   Loaded: loaded (/usr/lib/systemd/system/glusterfsd.service; disabled; vendor preset: disabled)
+   Active: active (exited) since Sun 2020-01-12 01:17:39 EST; 9s ago
+  Process: 29270 ExecStart=/bin/true (code=exited, status=0/SUCCESS)
+ Main PID: 29270 (code=exited, status=0/SUCCESS)
+
+1月 12 01:17:39 217-node systemd[1]: Starting GlusterFS brick processes (stopping only)...
+1月 12 01:17:39 217-node systemd[1]: Started GlusterFS brick processes (stopping only).
+[user9@217-node shell]$ ./catcpumem.sh
+物理总内存=MemTotal: 3848804 kB
+物理剩余内存=MemFree: 1785776 kB
+内核版本与操作系统=Linux version 4.18.0-80.el8.x86_64 (mockbuild@kbuilder.bsys.centos.org) (gcc version 8.2.1 20180905 (Red Hat 8.2.1-3) (GCC)) #1 SMP Tue Jun 4 09:19:46 UTC 2019
+cpu数目=4
+一个cpu上的核数=cpu cores : 1
+一个cpu上的核数和cpu型号和每个核的频率= 4 Intel(R) Celeron(R) CPU J3455 @ 1.50GHz
+---------------------------------------------
+node 从集群删除后， 再重新加入集群， node之前的label也消失了 如：
+[master@212-node ~]$ kubectl get nodes --show-labels
+NAME       STATUS   ROLES    AGE     VERSION   LABELS
+212-node   Ready    master   26h     v1.17.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=212-node,kubernetes.io/os=linux,node-role.kubernetes.io/master=
+213-node   Ready    <none>   6h15m   v1.17.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=213-node,kubernetes.io/os=linux
+217-node   Ready    <none>   29m     v1.17.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=217-node,kubernetes.io/os=linux
+219-node   Ready    <none>   21h     v1.17.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=219-node,kubernetes.io/os=linux,storagenode=glusterfs
+220-node   Ready    <none>   5h28m   v1.17.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=220-node,kubernetes.io/os=linux
+68-node    Ready    <none>   25h     v1.17.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=68-node,kubernetes.io/os=linux
+
+
+
+------------
+glusterfsd 有没有用在运行
+
+[user9@217-node shell]$ systemctl status glusterfsd
+● glusterfsd.service - GlusterFS brick processes (stopping only)
+   Loaded: loaded (/usr/lib/systemd/system/glusterfsd.service; disabled; vendor preset: disabled)
+   Active: active (exited) since Sun 2020-01-12 01:17:39 EST; 55min ago
+  Process: 29270 ExecStart=/bin/true (code=exited, status=0/SUCCESS)
+ Main PID: 29270 (code=exited, status=0/SUCCESS)
+[user9@217-node shell]$ ps -e | grep glus
+ 46711 ?        00:00:00 glusterd
+[user9@217-node shell]$

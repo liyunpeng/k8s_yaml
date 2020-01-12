@@ -1,0 +1,304 @@
+[master@212-node ~]$ k get SA
+error: the server doesn't have a resource type "SA"
+[master@212-node ~]$ k get sa
+NAME                     SECRETS   AGE
+default                  1         29h
+heketi-service-account   1         28h
+[master@212-node ~]$ k get role
+No resources found in default namespace.
+[master@212-node ~]$ kd sa heketi-service-account
+Name:                heketi-service-account
+Namespace:           default
+Labels:              <none>
+Annotations:         kubectl.kubernetes.io/last-applied-configuration:
+                       {"apiVersion":"v1","kind":"ServiceAccount","metadata":{"annotations":{},"name":"heketi-service-account","namespace":"default"}}
+Image pull secrets:  <none>
+Mountable secrets:   heketi-service-account-token-h9rzt
+Tokens:              heketi-service-account-token-h9rzt
+Events:              <none>
+[master@212-node ~]$ ^C
+[master@212-node ~]$ k get clusterrole
+NAME                                                                   AGE
+admin                                                                  29h
+calico-kube-controllers                                                29h
+calico-node                                                            29h
+cluster-admin                                                          29h
+edit                                                                   29h
+flannel                                                                29h
+foo                                                                    115m
+system:aggregate-to-admin                                              29h
+system:aggregate-to-edit                                               29h
+system:aggregate-to-view                                               29h
+system:auth-delegator                                                  29h
+system:basic-user                                                      29h
+system:certificates.k8s.io:certificatesigningrequests:nodeclient       29h
+system:certificates.k8s.io:certificatesigningrequests:selfnodeclient   29h
+system:controller:attachdetach-controller                              29h
+system:controller:certificate-controller                               29h
+system:controller:clusterrole-aggregation-controller                   29h
+system:controller:cronjob-controller                                   29h
+system:controller:daemon-set-controller                                29h
+system:controller:deployment-controller                                29h
+system:controller:disruption-controller                                29h
+system:controller:endpoint-controller                                  29h
+system:controller:expand-controller                                    29h
+system:controller:generic-garbage-collector                            29h
+system:controller:horizontal-pod-autoscaler                            29h
+system:controller:job-controller                                       29h
+system:controller:namespace-controller                                 29h
+system:controller:node-controller                                      29h
+system:controller:persistent-volume-binder                             29h
+system:controller:pod-garbage-collector                                29h
+system:controller:pv-protection-controller                             29h
+system:controller:pvc-protection-controller                            29h
+system:controller:replicaset-controller                                29h
+system:controller:replication-controller                               29h
+system:controller:resourcequota-controller                             29h
+system:controller:route-controller                                     29h
+system:controller:service-account-controller                           29h
+system:controller:service-controller                                   29h
+system:controller:statefulset-controller                               29h
+system:controller:ttl-controller                                       29h
+system:coredns                                                         29h
+system:discovery                                                       29h
+system:heapster                                                        29h
+system:kube-aggregator                                                 29h
+system:kube-controller-manager                                         29h
+system:kube-dns                                                        29h
+system:kube-scheduler                                                  29h
+system:kubelet-api-admin                                               29h
+system:node                                                            29h
+system:node-bootstrapper                                               29h
+system:node-problem-detector                                           29h
+system:node-proxier                                                    29h
+system:persistent-volume-provisioner                                   29h
+system:public-info-viewer                                              29h
+system:volume-scheduler                                                29h
+view                                                                   29h
+[master@212-node ~]$ kd clusterrole foo
+Name:         foo
+Labels:       <none>
+Annotations:  <none>
+PolicyRule:
+  Resources    Non-Resource URLs  Resource Names  Verbs
+  ---------    -----------------  --------------  -----
+  pods/exec    []                 []              [get list watch create]
+  pods/status  []                 []              [get list watch create]
+  pods         []                 []              [get list watch create]
+[master@212-node ~]$ k create clusterrolebinding my-ca-view --clusterrole=
+admin                                                                 system:controller:persistent-volume-binder
+calico-kube-controllers                                               system:controller:pod-garbage-collector
+calico-node                                                           system:controller:pvc-protection-controller
+cluster-admin                                                         system:controller:pv-protection-controller
+edit                                                                  system:controller:replicaset-controller
+flannel                                                               system:controller:replication-controller
+foo                                                                   system:controller:resourcequota-controller
+system:aggregate-to-admin                                             system:controller:route-controller
+system:aggregate-to-edit                                              system:controller:service-account-controller
+system:aggregate-to-view                                              system:controller:service-controller
+system:auth-delegator                                                 system:controller:statefulset-controller
+system:basic-user                                                     system:controller:ttl-controller
+system:certificates.k8s.io:certificatesigningrequests:nodeclient      system:coredns
+system:certificates.k8s.io:certificatesigningrequests:selfnodeclient  system:discovery
+system:controller:attachdetach-controller                             system:heapster
+system:controller:certificate-controller                              system:kube-aggregator
+system:controller:clusterrole-aggregation-controller                  system:kube-controller-manager
+system:controller:cronjob-controller                                  system:kube-dns
+system:controller:daemon-set-controller                               system:kubelet-api-admin
+system:controller:deployment-controller                               system:kube-scheduler
+system:controller:disruption-controller                               system:node
+system:controller:endpoint-controller                                 system:node-bootstrapper
+system:controller:expand-controller                                   system:node-problem-detector
+system:controller:generic-garbage-collector                           system:node-proxier
+system:controller:horizontal-pod-autoscaler                           system:persistent-volume-provisioner
+system:controller:job-controller                                      system:public-info-viewer
+system:controller:namespace-controller                                system:volume-scheduler
+system:controller:node-controller                                     view
+[master@212-node ~]$ k create clusterrolebinding my-ca-view --clusterrole=foo --serv
+--server           --server=          --serviceaccount   --serviceaccount=
+[master@212-node ~]$ k create clusterrolebinding my-ca-view --clusterrole=foo --serv
+--server           --server=          --serviceaccount   --serviceaccount=
+[master@212-node ~]$ k create clusterrolebinding my-ca-view --clusterrole=foo --serviceaccount=heketi-service-account --namespace=default
+error: serviceaccount must be <namespace>:<name>
+[master@212-node ~]$ k create clusterrolebinding my-ca-view --clusterrole=foo --serviceaccount=default:heketi-service-account --namespace=default
+clusterrolebinding.rbac.authorization.k8s.io/my-ca-view created
+[master@212-node ~]$ k get cr
+error: the server doesn't have a resource type "cr"
+[master@212-node ~]$ k get po -owide
+NAME                             READY   STATUS    RESTARTS   AGE    IP               NODE       NOMINATED NODE   READINESS GATES
+deploy-heketi-65d9c564d6-48xkg   1/1     Running   1          20h    192.168.244.66   68-node    <none>           <none>
+glusterfs-jhxhp                  1/1     Running   0          3h6m   192.168.0.217    217-node   <none>           <none>
+
+
+[master@212-node ~]$ k get secrets
+NAME                                 TYPE                                  DATA   AGE
+default-token-24p4w                  kubernetes.io/service-account-token   3      29h
+heketi-service-account-token-h9rzt   kubernetes.io/service-account-token   3      28h
+
+
+-----------------------------------
+  1 existing signature left on the device.
+[root@deploy-heketi-65d9c564d6-48xkg /]# y
+bash: y: command not found
+[root@deploy-heketi-65d9c564d6-48xkg /]# heketi-cli topology load --json=/etc/heketi/heketi_topology.json
+        Found node 217-node on cluster 212c86092693f25bf70a5cfce293eb27
+                Adding device /dev/sdb ... y
+Unable to add device: Setup of device /dev/sdb failed (already initialized or contains data?):   WARNING: Failed to connect to lvmetad. Falling back to device scanning.
+  WARNING: Device /dev/sda not initialized in udev database even after waiting 10000000 microseconds.
+  WARNING: Device /dev/cl/root not initialized in udev database even after waiting 10000000 microseconds.
+  WARNING: Device /dev/sda1 not initialized in udev database even after waiting 10000000 microseconds.
+  WARNING: Device /dev/cl/swap not initialized in udev database even after waiting 10000000 microseconds.
+  WARNING: Device /dev/sda2 not initialized in udev database even after waiting 10000000 microseconds.
+  WARNING: Device /dev/cl/home not initialized in udev database even after waiting 10000000 microseconds.
+  WARNING: Device /dev/sdb not initialized in udev database even after waiting 10000000 microseconds.
+  WARNING: Device /dev/cl/root not initialized in udev database even after waiting 10000000 microseconds.
+  WARNING: Device /dev/sda1 not initialized in udev database even after waiting 10000000 microseconds.
+  WARNING: Device /dev/cl/swap not initialized in udev database even after waiting 10000000 microseconds.
+  WARNING: Device /dev/sda2 not initialized in udev database even after waiting 10000000 microseconds.
+  WARNING: Device /dev/cl/home not initialized in udev database even after waiting 10000000 microseconds.
+  WARNING: Device /dev/sdb not initialized in udev database even after waiting 10000000 microseconds.
+WARNING: dos signature detected on /dev/sdb at offset 510. Wipe it? [y/n]: [n]
+  Aborted wiping of dos.
+  1 existing signature left on the device.
+[root@deploy-heketi-65d9c564d6-48xkg /]# y
+bash: y: command not found
+[root@deploy-heketi-65d9c564d6-48xkg /]# vi /etc/heketi/heketi
+heketi.json           heketi_topology.json
+[root@deploy-heketi-65d9c564d6-48xkg /]# vi /etc/heketi/heketi_topology.json
+[root@deploy-heketi-65d9c564d6-48xkg /]# heketi-cli topology load --json=/etc/heketi/heketi_topology.json
+        Found node 217-node on cluster 212c86092693f25bf70a5cfce293eb27
+                Adding device /dev/sdb1 ... OK
+
+
+-----------------------------
+master@212-node k8s_yaml]$ k get pvc
+NAME                  STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS      AGE
+pvc-gluster-heketi    Pending                                      gluster-heketi    7m11s
+pvc-glustera-heketi   Pending                                      glustera-heketi   19s
+[master@212-node k8s_yaml]$ k get pv
+No resources found in default namespace.
+[master@212-node k8s_yaml]$ k get pv
+No resources found in default namespace.
+[master@212-node k8s_yaml]$ kd pvc pvc-gluster-heketi
+Name:          pvc-gluster-heketi
+Namespace:     default
+StorageClass:  gluster-heketi
+Status:        Pending
+Volume:
+Labels:        <none>
+Annotations:   kubectl.kubernetes.io/last-applied-configuration:
+                 {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"pvc-gluster-heketi","namespace":"default"},"spec":{...
+               volume.beta.kubernetes.io/storage-provisioner: kubernetes.io/glusterfs
+Finalizers:    [kubernetes.io/pvc-protection]
+Capacity:
+Access Modes:
+VolumeMode:    Filesystem
+Mounted By:    <none>
+Events:
+  Type     Reason              Age                  From                         Message
+  ----     ------              ----                 ----                         -------
+  Warning  ProvisioningFailed  2m5s (x12 over 12m)  persistentvolume-controller  Failed to provision volume with StorageClass "gluster-heketi": failed to create volume: failed to create volume: Post http://192.168.0.217:8080/volumes: dial tcp 192.168.0.217:8080: connect: connection refused
+[master@212-node k8s_yaml]$ kd pvc pvc-glustera-heketi
+Name:          pvc-glustera-heketi
+Namespace:     default
+StorageClass:  glustera-heketi
+Status:        Pending
+Volume:
+Labels:        <none>
+Annotations:   kubectl.kubernetes.io/last-applied-configuration:
+                 {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"pvc-glustera-heketi","namespace":"default"},"spec":...
+               volume.beta.kubernetes.io/storage-provisioner: kubernetes.io/glusterfs
+Finalizers:    [kubernetes.io/pvc-protection]
+Capacity:
+Access Modes:
+VolumeMode:    Filesystem
+Mounted By:    <none>
+Events:
+  Type     Reason              Age                  From                         Message
+  ----     ------              ----                 ----                         -------
+  Warning  ProvisioningFailed  14s (x10 over 6m9s)  persistentvolume-controller  Failed to provision volume with StorageClass "glustera-heketi": failed to create volume: failed to create volume: Post http://192.168.0.212:8080/volumes: dial tcp 192.168.0.212:8080: connect: connection refused
+
+
+======================================================
+[root@deploy-heketi-65d9c564d6-48xkg /]# heketi-cli topology load --json=/etc/heketi/heketi_topology.json
+        Found node 217-node on cluster 212c86092693f25bf70a5cfce293eb27
+                Adding device /dev/sdb1 ... OK
+[root@deploy-heketi-65d9c564d6-48xkg /]# tail /var/
+adm/      db/       ftp/      gopher/   lib/      lock/     mail/     opt/      run/      tmp/
+cache/    empty/    games/    kerberos/ local/    log/      nis/      preserve/ spool/    yp/
+[root@deploy-heketi-65d9c564d6-48xkg /]# tail /var/
+adm/      db/       ftp/      gopher/   lib/      lock/     mail/     opt/      run/      tmp/
+cache/    empty/    games/    kerberos/ local/    log/      nis/      preserve/ spool/    yp/
+[root@deploy-heketi-65d9c564d6-48xkg /]# tail /var/lo
+local/ lock/  log/
+[root@deploy-heketi-65d9c564d6-48xkg /]# tail /var/lo
+local/ lock/  log/
+[root@deploy-heketi-65d9c564d6-48xkg /]# tail /var/log/
+README           btmp             dnf.log          hawkey.log       lastlog          wtmp
+anaconda/        dnf.librepo.log  dnf.rpm.log      journal/         tallylog
+[root@deploy-heketi-65d9c564d6-48xkg /]# tail /var/log/
+README           btmp             dnf.log          hawkey.log       lastlog          wtmp
+anaconda/        dnf.librepo.log  dnf.rpm.log      journal/         tallylog
+[root@deploy-heketi-65d9c564d6-48xkg /]# heketi-cli
+.dockerenv  boot/       etc/        lib/        lost+found/ mnt/        proc/       run/        srv/        tmp/        var/
+bin/        dev/        home/       lib64/      media/      opt/        root/       sbin/       sys/        usr/
+[root@deploy-heketi-65d9c564d6-48xkg /]# heketi-cli
+.dockerenv  boot/       etc/        lib/        lost+found/ mnt/        proc/       run/        srv/        tmp/        var/
+bin/        dev/        home/       lib64/      media/      opt/        root/       sbin/       sys/        usr/
+[root@deploy-heketi-65d9c564d6-48xkg /]# heketi-cli topology info
+
+Cluster Id: 212c86092693f25bf70a5cfce293eb27
+
+    File:  true
+    Block: true
+
+    Volumes:
+
+
+    Nodes:
+
+        Node Id: db7b2cdc2a770dd622674ecb2df13044
+        State: online
+        Cluster Id: 212c86092693f25bf70a5cfce293eb27
+        Zone: 1
+        Management Hostnames: 217-node
+        Storage Hostnames: 192.168.0.217
+        Devices:
+                Id:116a025287fa349844aca4a34c6e902e   Name:/dev/sdb1           State:online    Size (GiB):19      Used (GiB):0       Free (GiB):19
+                        Bricks:
+
+[root@deploy-heketi-65d9c564d6-48xkg /]# cat /etc/heketi/heketi
+heketi.json           heketi_topology.json
+[root@deploy-heketi-65d9c564d6-48xkg /]# cat /etc/heketi/heketi_topology.json
+{
+  "clusters": [
+    {
+      "nodes": [
+        {
+          "node": {
+            "hostnames": {
+              "manage": [
+                "217-node"
+              ],
+              "storage": [
+                "192.168.0.217"
+              ]
+            },
+            "zone": 1
+          },
+          "devices": [
+            "/dev/sdb1"
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+
+[master@212-node k8s_yaml]$ sudo pvs
+[sudo] master 的密码：
+  PV         VG  Fmt  Attr PSize   PFree
+  /dev/sda2  cl  lvm2 a--  <79.00g    0
+  /dev/sdb1  vg0 lvm2 a--  <10.00g 4.98g
+[master@212-node k8s_yaml]$
