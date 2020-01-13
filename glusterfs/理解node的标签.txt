@@ -1,0 +1,10 @@
+一个node 可以有多个标签，主要作用是决定pod是否要调度到本node上
+node 从集群删除后， 再重新加入集群， node之前的label也消失了, 如217-node之前有storagenode=glusterfs，删除之后再重新加入就没有了：
+[master@212-node ~]$ kubectl get nodes --show-labels
+NAME       STATUS   ROLES    AGE     VERSION   LABELS
+212-node   Ready    master   26h     v1.17.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=212-node,kubernetes.io/os=linux,node-role.kubernetes.io/master=
+213-node   Ready    <none>   6h15m   v1.17.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=213-node,kubernetes.io/os=linux
+217-node   Ready    <none>   29m     v1.17.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=217-node,kubernetes.io/os=linux
+219-node   Ready    <none>   21h     v1.17.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=219-node,kubernetes.io/os=linux,storagenode=glusterfs
+220-node   Ready    <none>   5h28m   v1.17.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=220-node,kubernetes.io/os=linux
+68-node    Ready    <none>   25h     v1.17.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=68-node,kubernetes.io/os=linux
