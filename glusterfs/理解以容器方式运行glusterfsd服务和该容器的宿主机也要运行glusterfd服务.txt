@@ -1,4 +1,4 @@
-这也是为heketi准备glusterfsd服务
+这也是为heketi做的准备，准备一个glusterfsd服务
 理解以容器方式运行glusterfsd服务和该容器的宿主机也要运行glusterfd服务
 glusterfsd 服务的最终目的， 是接收heketi  server api 方式发来的命令， 然后在glusterfs集群里的目标硬盘分区上建立glusterfs文件系统。 
 k8s 集群和 glusterfs集群是两个不同的集群， 但在k8s集群中的一些主机也可以在glusterfs集群
