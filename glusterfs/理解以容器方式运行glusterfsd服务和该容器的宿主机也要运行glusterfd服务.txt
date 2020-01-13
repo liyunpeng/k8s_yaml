@@ -257,3 +257,9 @@ glusterfsd 有没有用在运行， 可以看进程， 也可以看服务
   Process: 29270 ExecStart=/bin/true (code=exited, status=0/SUCCESS)
  Main PID: 29270 (code=exited, status=0/SUCCESS)
 Active: active (exited) 表示服务glusterfsd在运行
+
+查看本机上的卷
+[master@212-node k8s_yaml]$ sudo pvs
+  PV         VG  Fmt  Attr PSize   PFree
+  /dev/sda2  cl  lvm2 a--  <79.00g    0
+  /dev/sdb1  vg0 lvm2 a--  <10.00g 4.98g
