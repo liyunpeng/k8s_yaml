@@ -244,3 +244,16 @@ Jan 11 08:17:51 213-node systemd[1]: Unit glusterd.service entered failed state.
 Jan 11 08:17:51 213-node systemd[1]: glusterd.service failed.
   Warning  BackOff  3m34s (x477 over 176m)  kubelet, 213-node  Back-off restarting failed container
 原因是213-node主机上没有启动glusterd.service服务
+glusterfsd 有没有用在运行， 可以看进程， 也可以看服务
+看进程：
+[user9@217-node shell]$ ps -e | grep glus
+ 46711 ?        00:00:00 glusterd
+有 glusterd， 表示glusterfs服务在运行
+看服务：
+[user9@217-node shell]$ systemctl status glusterfsd
+● glusterfsd.service - GlusterFS brick processes (stopping only)
+   Loaded: loaded (/usr/lib/systemd/system/glusterfsd.service; disabled; vendor preset: disabled)
+   Active: active (exited) since Sun 2020-01-12 01:17:39 EST; 55min ago
+  Process: 29270 ExecStart=/bin/true (code=exited, status=0/SUCCESS)
+ Main PID: 29270 (code=exited, status=0/SUCCESS)
+Active: active (exited) 表示服务glusterfsd在运行
