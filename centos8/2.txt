@@ -1,3 +1,4 @@
+先看一下calico情况：
 [master@bogon centos8]$ k describe po calico-node-kbvvj -n=kube-system
 Name:                 calico-node-kbvvj
 Namespace:            kube-system
@@ -199,10 +200,7 @@ Events:
   Normal   Pulled     3m36s (x4 over 4m31s)  kubelet, 68-node   Container image "calico/node:v3.10.2" already present on machine
   Normal   Created    3m36s (x4 over 4m31s)  kubelet, 68-node   Created container calico-node
 
-
-
-[master@bogon centos8]$ k logs po calico-node-kbvvj -n=kube-system
-Error from server (NotFound): pods "po" not found
+看下calico的Log：
 [master@bogon centos8]$ k logs calico-node-kbvvj -n=kube-system
 2020-01-01 11:03:52.532 [INFO][8] startup.go 259: Early log level set to info
 2020-01-01 11:03:52.532 [INFO][8] startup.go 275: Using NODENAME environment for node name
@@ -216,27 +214,6 @@ Error from server (NotFound): pods "po" not found
 2020-01-01 11:03:52.565 [INFO][8] startup.go 455: Node IPv4 changed, will check for conflicts
 2020-01-01 11:03:52.574 [WARNING][8] startup.go 943: Calico node '214-node' is already using the IPv4 address 10.88.0.1.
 2020-01-01 11:03:52.574 [INFO][8] startup.go 213: Clearing out-of-date IPv4 address from this node IP="10.88.0.1/16"
-[master@bogon centos8]$ k get po -n=kube-system -owide
-NAME                                       READY   STATUS             RESTARTS   AGE     IP              NODE       NOMINATED NODE   READINESS GATES
-calico-kube-controllers-74c9747c46-fwhtq   1/1     Running            0          10m     192.168.29.3    bogon      <none>           <none>
-calico-node-hx95t                          0/1     Running            0          10m     192.168.0.212   bogon      <none>           <none>
-calico-node-hzsgt                          0/1     Running            0          8m39s   192.168.0.214   214-node   <none>           <none>
-calico-node-kbvvj                          0/1     CrashLoopBackOff   6          6m43s   192.168.0.68    68-node    <none>           <none>
-coredns-9d85f5447-2hw5f        2020-01-01 11:03:52.588 [WARNING][8] startup.go 1122: Terminating
-
-
-
-[master@bogon centos8]$ k describe po calico-node-kbvvj -n=kube-system
-Error from server (NotFound): pods "calico-node-kbvvj" not found
-
-
-
-[centos2@213-node ~]$  sudo kubeadm join 192.168.0.212:6443 --token kbz6ax.qht1g7q6qoocky3y     --discovery-token-ca-cert-hash sha256:2c9d11fddf43036482b5c7b503aa8ea83e90074b4846caac17f1b77f9684cf48
-
-[master@bogon service]$ k get po -n=kube-system  -owide
-NAME                                       READY   STATUS              RESTARTS   AGE    IP              NODE       NOMINATED NODE   READINESS GATES
-calico-kube-controllers-74c9747c46-fwhtq   1/1     Running             0          109m   192.168.29.3    bogon      <none>           <none>
-calico-node-cmd7b                          0/1     Init:0/3            0          76s    192.168.0.213   213-node   <none>           <none>
 
 
 
@@ -445,22 +422,17 @@ NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                  
 kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP                         115m   <none>
 svc-1-name   NodePort    10.96.195.247   <none>        8081:30001/TCP,8085:30550/TCP   50m    name=rc-tomcat-template-label
 
-可以ping通， 但服务访问不了
+可以ping通， 但服务访问不了， 
 [centos5@68-node samba]$ ping 10.96.195.247
 PING 10.96.195.247 (10.96.195.247) 56(84) bytes of data.
 64 bytes from 10.96.195.247: icmp_seq=1 ttl=64 time=0.147 ms
 64 bytes from 10.96.195.247: icmp_seq=2 ttl=64 time=0.061 ms
-64 bytes from 10.96.195.247: icmp_seq=3 ttl=64 time=0.065 ms
-64 bytes from 10.96.195.247: icmp_seq=4 ttl=64 time=0.053 ms
-
-服务访问不了
 
 [centos5@68-node samba]$ curl 10.96.195.247
 curl: (7) Failed to connect to 10.96.195.247 port 80: 拒绝连接
 [centos5@68-node samba]$ curl 10.96.195.247:8081
 
-=========================
-
+原因分析： service是nodeport方式， 需要访问物理机的Ip和地址
 [centos5@68-node k8s_yaml]$ curl 192.168.0.212:30001 | less
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
