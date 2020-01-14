@@ -1,4 +1,4 @@
-有了三台主机的准备， 和glusterfs容器的部署， 两个条件准备好了后， 就可以创建运行创建heketi的pod了， 
+有了三台主机的准备， 和glusterfs容器的部署， 两个条件准备好了后， 就可以创建运行heketi的pod了， 
 上文件heketi-deployment-svc.yaml：
 ---
 kind: Service
@@ -131,7 +131,29 @@ WARNING: dos signature detected on /dev/sdb at offset 510. Wipe it? [y/n]: [n]
 
 （2）容器缺少权限
 第一个问题解决后， 加载分区时，还会遇到
+[root@deploy-heketi-65d9c564d6-48xkg /]# heketi-cli topology load --json=/etc/heketi/heketi_topology.json
+提示nospace 错误
+  实际并不是nospace，而是运行heketi的pod没有权限，
+  解决办法：创建一个角色，把角色绑定给heketi pod的serviceaccount，即为这个pod授权
+  创建角色：
+  
+  查看角色：
+  [master@212-node ~]$ kd clusterrole foo
+Name:         foo
+Labels:       <none>
+Annotations:  <none>
+PolicyRule:
+  Resources    Non-Resource URLs  Resource Names  Verbs
+  ---------    -----------------  --------------  -----
+  pods/exec    []                 []              [get list watch create]
+  pods/status  []                 []              [get list watch create]
+  pods         []                 []              [get list watch create]
 
+  绑定角色：
+  创建一个集群角色绑定，即将集群角色foo绑定到指定的serviceaccount,  servicecount 只存在与一个namespace, 不能像角色一样全局存在，所以要带上namespace名字，构成全名，
+这里的指定的serviceaccount的全名就default:heketi-service-account 
+[master@212-node ~]$ k create clusterrolebinding my-ca-view --clusterrole=foo --serviceaccount=default:heketi-service-account --namespace=default
+clusterrolebinding.rbac.authorization.k8s.io/my-ca-view created
 
 [root@deploy-heketi-65d9c564d6-48xkg /]# heketi-cli topology load --json=/etc/heketi/heketi_topology.json
         Found node 217-node on cluster 212c86092693f25bf70a5cfce293eb27
@@ -154,10 +176,7 @@ Cluster Id: 212c86092693f25bf70a5cfce293eb27
                 Id:116a025287fa349844aca4a34c6e902e   Name:/dev/sdb1           State:online    Size (GiB):19      Used (GiB):0       Free (GiB):19
                         Bricks:
 
-
-
 4.  创建一个pvc
-
 master@212-node k8s_yaml]$ k get pvc
 NAME                  STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS      AGE
 pvc-gluster-heketi    Pending                                      gluster-heketi    7m11s
