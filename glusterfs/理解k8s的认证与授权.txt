@@ -1,3 +1,6 @@
+=========================================================
+k8s的认证
+认证英文名是authetification,  认证就是对身份的认证，身份就是数字签名，认证就是对签名证书的验证。签名证书放在secrets里，secrets放在SeviceAccout里。
 1. ServiceAcount的描述
 K8s世界里的所有东西，都是资源，都要用yaml文件描述，
 描述里必须有三个描述项：
@@ -52,7 +55,8 @@ ca.crt:     1025 bytes
 namespace:  7 bytes
 token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IkJGTTcyYmN1QklqZm1HS3JxZVZIaHFvQnF6NUxCWldnMUhGRjFvM3RnUUUifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tMjRwNHciLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjA0YjcxMWM2LTgyODgtNGQ2OS1iYTE4LWZmYzQ4NmJiZTU1YiIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.Ir889LHIkOClCdUkEKKIsdxNELiIeGQi8_GUrEI7F7r9NzOqgG1fjxNYBwXQCgKnTHuzhXtUXC_BtBL1BHFR-_hTIWrbVvGmYgaII6VSCiGctdgUyrUHKMdFbJ6gqml-17zjktpp94ZTSyZjTfcb5C6IAwvhfgNP6hT-B_9MAhT9_rKTyg4VXmcvgxryxxArBOwaExO-yRyE7OD0a9jATwx9-ICdvM4khlfzzQz8lbnExvzEmamAcL_BbwgVeEC-AviH1_jZkfHyKoUSwGfZ8qu8iP-HT3fhHRiwO15T4lKnPjMjN1Dyd-wTsMk-gZwrhZX1lsgrMj3HBToeiG6Fjg
 
-  每个pod都有自己的ca.crt文件，在pod的内部，进到pod里面看一下：
+  每个pod包含的serviceaccount信息都放在pod的/run/secrets/kubernetes.io/serviceaccount/目录下。有三个文件：ca.crt, token, namespace. 
+  进到pod里面看一下这三个文件：
 [master@212-node ~]$ k exec -it glusterfs-jhxhp bash
 [root@217-node /]# ls /run/secrets/kubernetes.io/serviceaccount/ca.crt -l
 lrwxrwxrwx. 1 root root 13 Jan 13 15:09 /run/secrets/kubernetes.io/serviceaccount/ca.crt -> ..data/ca.crt
@@ -81,21 +85,17 @@ eyJhbGciOiJSUzI1NiIsImtpZCI6IkJGTTcyYmN1QklqZm1HS3JxZVZIaHFvQnF6NUxCWldnMUhGRjFv
     这个token就是pod的签名证书，只不过是JWT格式的， 发给apiserver， apiserver以此确定pod的身份是对的。 
     这样就完成了pod与apiserver的双向身份验证。 是k8s的高安全性的基础。
     
-    
-[root@217-node /]# cat /run/secrets/kubernetes.io/serviceaccount/namespace
+    serviceAccoun只能在一个namespace有效，
+    [root@217-node /]# cat /run/secrets/kubernetes.io/serviceaccount/namespace
 default
-
   
-    
-    
-    
-    
-    
-2. 角色，servicecount, 角色绑定到servicecount
-     一个角色就是一组权限的集合，比如市长对交通局的局长有一定的权限，如果市长标签绑定到一个人，他就有了这个权限
-k8s世界里，也用角色来管理权限， 角色绑定到一个实体对象，  这个对象就有了权限， 这个实体对象可以是user, 也可以是serviceaccount. 
+========================================================================= 
+   k8s的授权    
+   一个角色就是一组权限的集合，比如市长对交通局的局长有一定的权限，如果市长标签绑定到一个人，他就有了这个权限
+k8s世界里，也用角色来管理权限， 角色绑定到一个实体对象， 这个对象就有了权限，所以把角色绑定到某个对象， 就是对某个对象授权。
+这个实体对象可以是user, 也可以是serviceaccount. 
 为叙述方便 ， serviceaccount简称sa
-user是给人用的， sa是给进程用的， pod 都用有默认的sa如果需要特定的sa可以在pod定义文件yaml文件指定
+user是给人用的， sa是给pod用的， pod 都用有默认的sa如果需要特定的sa可以在pod定义文件yaml文件指定
 pod拥有了sa, 就拥有了绑定到这个sa上的所有角色的权限。 
     角色有个体角色和群集角色，角色也是k8s的资源，可以创建查看：
 查看所有个体角色
