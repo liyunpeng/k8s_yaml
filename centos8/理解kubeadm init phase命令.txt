@@ -1,0 +1,42 @@
+kubeadm init创建一个k8s集群的master, 包括以下几个阶段：
+kubeadm 初始化启动前检查阶段
+kubeadm 初始化启动 kubelet 阶段
+kubeadm 初始化证书阶段
+kubeadm 初始化 kubeconfig 阶段
+kubeadm 初始化 control-plane 阶段
+kubeadm 初始化 etcd 阶段
+kubeadm 初始化上传 config 配置阶段
+kubeadm 初始化上传证书阶段
+kubeadm 初始化标记控制平面阶段
+kubeadm 初始化引导令牌阶段
+kubeadm 初始化插件阶段
+
+kubeadm init phase可以生成这些阶段的配置文件，pod清单文件，上传配置，安装插件等
+
+1. 生成指定子模块的配置文件
+kubeadm init phase kubeconfig admin - 为管理员和 kubeadm 本身生成一个 kubeconfig 文件
+kubeadm init phase kubeconfig all - 生成所有 kubeconfig 文件
+kubeadm init phase kubeconfig controller-manager - 生成 kubeconfig 文件给控制器管理器使用
+kubeadm init phase kubeconfig kubelet - 为 kubelet 生成 kubeconfig 文件，*仅*用于集群引导
+kubeadm init phase kubeconfig scheduler - 生成 kubeconfig 文件给调度程序使用
+
+2. 生成pod的清单文件
+kubeadm init phase control-plane all - 生成所有静态 Pod 清单文件
+kubeadm init phase control-plane apiserver - 生成 kube-apiserver 静态 Pod 清单
+kubeadm init phase control-plane controller-manager - 生成 kube-controller-manager 静态 Pod 清单
+kubeadm init phase control-plane scheduler - 生成 kube-scheduler 静态 Pod 清单
+
+3. 配置上传到configmap
+kubeadm init phase upload-config all - 将所有的配置上传到 ConfigMap 中
+kubeadm init phase upload-config kubeadm - 将 kubeadm 的集群配置上传到 ConfigMap 中
+kubeadm init phase upload-config kubelet - 将 kubelet 的组件配置上传到 ConfigMap 中
+
+4. 安装插件
+kubeadm init phase addon all - 安装所有的插件
+kubeadm init phase addon coredns - 将 CoreDNS 插件安装到 Kubernetes 集群
+kubeadm init phase addon kube-proxy - 将 kube-proxy 插件安装到 Kubernetes 集群
+
+其他命令：
+kubeadm join 将节点连接到集群
+kubeadm reset 恢复通过 kubeadm init 或 kubeadm join 操作对主机所做的任何更改
+kubeadm alpha 尝试实验性功能
