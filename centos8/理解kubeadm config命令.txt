@@ -1,0 +1,85 @@
+1.  查看k8s的所有镜像
+$ kubeadm config images list
+W0111 10:21:20.400324  129473 version.go:101] could not fetch a Kubernetes version from the internet: unable to get URL "https://dl.k8s.io/release/stable-1.txt": Get https://dl.k8s.io/release/stable-1.txt: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)
+W0111 10:21:20.400455  129473 version.go:102] falling back to the local client version: v1.17.0
+W0111 10:21:20.400679  129473 validation.go:28] Cannot validate kube-proxy config - no validator is available
+W0111 10:21:20.400701  129473 validation.go:28] Cannot validate kubelet config - no validator is available
+k8s.gcr.io/kube-apiserver:v1.17.0
+k8s.gcr.io/kube-controller-manager:v1.17.0
+k8s.gcr.io/kube-scheduler:v1.17.0
+k8s.gcr.io/kube-proxy:v1.17.0
+k8s.gcr.io/pause:3.1
+k8s.gcr.io/etcd:3.4.3-0
+k8s.gcr.io/coredns:1.6.5
+
+2. 生成kubeadm模板配置文件
+ kubeadm config生成模板kubeadm1.yaml配置文件， 然后手动修改一下， 然后再用这个配置文件， kubeadm init出一个k8s的master出来
+$ kubeadm config print init-defaults > kubeadm1.yaml
+$ cat kubeadm1.yaml
+apiVersion: kubeadm.k8s.io/v1beta2
+bootstrapTokens:
+- groups:
+  - system:bootstrappers:kubeadm:default-node-token
+  token: abcdef.0123456789abcdef
+  ttl: 24h0m0s
+  usages:
+  - signing
+  - authentication
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: 1.2.3.4  需手动修改为192.168.0.212
+  bindPort: 6443
+nodeRegistration:
+  criSocket: /var/run/dockershim.sock
+  name: 212-node
+  taints:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/master
+---
+apiServer:
+  timeoutForControlPlane: 4m0s
+apiVersion: kubeadm.k8s.io/v1beta2
+certificatesDir: /etc/kubernetes/pki
+clusterName: kubernetes
+controllerManager: {}
+dns:
+  type: CoreDNS
+etcd:
+  local:
+    dataDir: /var/lib/etcd
+imageRepository: k8s.gcr.io
+kind: ClusterConfiguration
+kubernetesVersion: v1.17.0
+networking:
+  dnsDomain: cluster.local
+  serviceSubnet: 10.96.0.0/12    手动修改为192.169.0.0/16
+scheduler: {}
+
+用此配置文件启动master
+$ kubeadm init --config kubeadm1.yaml
+
+如果不用配置，则：
+$ kubeadm init --pod-network-cidr=192.169.0.0/16 \
+--apiserver-advertise-address=$IP_ADDR \
+--kubernetes-version  stable-1.16 \
+--ignore-preflight-errors=Swap \
+--image-repository registry.aliyuncs.com/google_containers
+
+3. view -h
+$ kubeadm config view -h
+Using this command, you can view the ConfigMap in the cluster where the configuration for kubeadm is located.
+The configuration is located in the "kube-system" namespace in the "kubeadm-config" ConfigMap.
+Usage:
+  kubeadm config view [flags]
+Flags:
+  -h, --help   help for view
+Global Flags:
+      --add-dir-header           If true, adds the file directory to the header
+      --kubeconfig string        The kubeconfig file to use when talking to the cluster. If the flag is not set, a set of standard locations can be searched for an existing kubeconfig file. (default "/etc/kubernetes/admin.conf")
+      --log-file string          If non-empty, use this log file
+      --log-file-max-size uint   Defines the maximum size a log file can grow to. Unit is megabytes. If the value is 0, the maximum file size is unlimited. (default 1800)
+      --rootfs string            [EXPERIMENTAL] The path to the 'real' host root filesystem.
+      --skip-headers             If true, avoid header prefixes in the log messages
+      --skip-log-headers         If true, avoid headers when opening log files
+  -v, --v Level                  number for the log level verbosity
+
