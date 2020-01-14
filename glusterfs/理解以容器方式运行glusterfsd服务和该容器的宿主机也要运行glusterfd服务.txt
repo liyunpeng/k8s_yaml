@@ -32,7 +32,7 @@ spec:
         glusterfs-node: pod
     spec:
       # 因为该pod必须运行在特定的主机上，所以定义node选择, 告诉调度器只能调度在标签为storagenode: glusterfs的主机node上
-      # 这里没有对pod的数量限制，所有有这个标签node都会被调度上本pod
+      # 这里没有对pod的数量限制，所以有这个标签node都会被调度上本pod
       nodeSelector:
         storagenode: glusterfs     
       # 容器的端口映射为主机的端口
@@ -248,7 +248,8 @@ glusterfsd 有没有用在运行， 可以看进程， 也可以看服务
 看进程：
 [user9@217-node shell]$ ps -e | grep glus
  46711 ?        00:00:00 glusterd
-有 glusterd， 表示glusterfs服务在运行
+有glusterd， 表示glusterfs服务在运行
+
 看服务：
 [user9@217-node shell]$ systemctl status glusterfsd
 ● glusterfsd.service - GlusterFS brick processes (stopping only)
@@ -257,6 +258,12 @@ glusterfsd 有没有用在运行， 可以看进程， 也可以看服务
   Process: 29270 ExecStart=/bin/true (code=exited, status=0/SUCCESS)
  Main PID: 29270 (code=exited, status=0/SUCCESS)
 Active: active (exited) 表示服务glusterfsd在运行
+
+node只有被label之后，调度器才会把pod调度在这个node上，因为damonset设置了nodeselector
+[centos-8@216-node glusterfs]$ hostname
+216-node
+[centos-8@216-node glusterfs]$ kubectl label node 216-node  storagenode=glusterfs
+node/216-node labeled
 
 查看本机上的卷
 [master@212-node k8s_yaml]$ sudo pvs
