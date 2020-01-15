@@ -1,0 +1,112 @@
+kubeadm init创建一个k8s集群的master, 包括以下几个阶段：
+kubeadm 初始化启动前检查阶段
+kubeadm 初始化启动 kubelet 阶段
+kubeadm 初始化证书阶段
+kubeadm 初始化 kubeconfig 阶段
+kubeadm 初始化 control-plane 阶段
+kubeadm 初始化 etcd 阶段
+kubeadm 初始化上传 config 配置阶段
+kubeadm 初始化上传证书阶段
+kubeadm 初始化标记控制平面阶段
+kubeadm 初始化引导令牌阶段
+kubeadm 初始化插件阶段
+
+看一个具体例子：
+$ sudo kubeadm init --pod-network-cidr=192.169.0.0/16 --apiserver-advertise-address=$IP_ADDR --kubernetes-version  stable-1.16 --ignore-preflight-errors=Swap --image-res.com/google_containers
+
+FOE
+W0114 22:55:14.381041    3710 version.go:101] could not fetch a Kubernetes version from the internet: unable to get URL "https://dl.k8s.io/release/stable-1.16.tx/release/stable-1.16.txt: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)
+W0114 22:55:14.381264    3710 version.go:102] falling back to the local client version: v1.17.0
+W0114 22:55:14.381394    3710 validation.go:28] Cannot validate kube-proxy config - no validator is available
+W0114 22:55:14.381404    3710 validation.go:28] Cannot validate kubelet config - no validator is available
+当前K8s集群的版本号：
+[init] Using Kubernetes version: v1.17.0
+
+预检查：
+[preflight] Running pre-flight checks
+        [WARNING FileExisting-tc]: tc not found in system path
+[preflight] Pulling images required for setting up a Kubernetes cluster
+[preflight] This might take a minute or two, depending on the speed of your internet connection
+[preflight] You can also perform this action in beforehand using 'kubeadm config images pull'
+
+启动kubelet, 每个node上都要启动kubelet进程，kubelet做的工作：
+1. kubelet通过apiserver向master注册kubelet所在node的信息
+2. 监控node和pod对资源的使用。
+3. kubelet通过监听etcd获知所有pod的操作，比如有创建pod的操作，则kubelet监听，就创建Pod，
+具体：为Pod创建目录，从apiserver获取pod明细清单，为pod挂载卷，为pod下载secrets
+[kubelet-start] Writing kubelet environment file with flags to file "/var/lib/kubelet/kubeadm-flags.env"
+[kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+[kubelet-start] Starting the kubelet
+
+生成证书，包括各服务的证书，如apiserver, etcd/server
+[certs] Using certificateDir folder "/etc/kubernetes/pki"
+[certs] Generating "ca" certificate and key
+[certs] Generating "apiserver" certificate and key
+[certs] apiserver serving cert is signed for DNS names [220-node kubernetes kubernetes.default kubernetes.default.svc kubernetes.default.svc.cluster.local] and I20]
+[certs] Generating "apiserver-kubelet-client" certificate and key
+[certs] Generating "front-proxy-ca" certificate and key
+[certs] Generating "front-proxy-client" certificate and key
+[certs] Generating "etcd/ca" certificate and key
+[certs] Generating "etcd/server" certificate and key
+[certs] etcd/server serving cert is signed for DNS names [220-node localhost] and IPs [192.168.0.220 127.0.0.1 ::1]
+[certs] Generating "etcd/peer" certificate and key
+[certs] etcd/peer serving cert is signed for DNS names [220-node localhost] and IPs [192.168.0.220 127.0.0.1 ::1]
+[certs] Generating "etcd/healthcheck-client" certificate and key
+[certs] Generating "apiserver-etcd-client" certificate and key
+[certs] Generating "sa" key and public key
+
+在master主机的目录/etc/kubernates下生成配置文件：
+[kubeconfig] Using kubeconfig folder "/etc/kubernetes"
+[kubeconfig] Writing "admin.conf" kubeconfig file
+[kubeconfig] Writing "kubelet.conf" kubeconfig file
+[kubeconfig] Writing "controller-manager.conf" kubeconfig file
+[kubeconfig] Writing "scheduler.conf" kubeconfig file
+
+为apiserver, controller生成pod的yaml文件，因为apiserver和controller-manager都是pod，所有需要yaml文件
+[control-plane] Using manifest folder "/etc/kubernetes/manifests"
+[control-plane] Creating static Pod manifest for "kube-apiserver"
+[control-plane] Creating static Pod manifest for "kube-controller-manager"
+W0114 22:55:44.605681    3710 manifests.go:214] the default kube-apiserver authorization-mode is "Node,RBAC"; using "Node,RBAC"
+[control-plane] Creating static Pod manifest for "kube-scheduler"
+W0114 22:55:44.606830    3710 manifests.go:214] the default kube-apiserver authorization-mode is "Node,RBAC"; using "Node,RBAC"
+[etcd] Creating static Pod manifest for local etcd in "/etc/kubernetes/manifests"
+[wait-control-plane] Waiting for the kubelet to boot up the control plane as static Pods from directory "/etc/kubernetes/manifests". This can take up to 4m0s
+[apiclient] All control plane components are healthy after 36.003463 seconds
+[upload-config] Storing the configuration used in ConfigMap "kubeadm-config" in the "kube-system" Namespace
+[kubelet] Creating a ConfigMap "kubelet-config-1.17" in namespace kube-system with the configuration for the kubelets in the cluster
+[upload-certs] Skipping phase. Please see --upload-certs
+
+将本节点标记为master, 并且不允许pod调度在这个节点上
+[mark-control-plane] Marking the node 220-node as control-plane by adding the label "node-role.kubernetes.io/master=''"
+[mark-control-plane] Marking the node 220-node as control-plane by adding the taints [node-role.kubernetes.io/master:NoSchedule]
+
+配置权限：包括表示身份的tokens，角色，配置角色的权限
+[bootstrap-token] Using token: 8ivv0x.tdecpkqxm6kshc81
+[bootstrap-token] Configuring bootstrap tokens, cluster-info ConfigMap, RBAC Roles
+[bootstrap-token] configured RBAC rules to allow Node Bootstrap tokens to post CSRs in order for nodes to get long term certificate credentials
+[bootstrap-token] configured RBAC rules to allow the csrapprover controller automatically approve CSRs from a Node Bootstrap Token
+[bootstrap-token] configured RBAC rules to allow certificate rotation for all node client certificates in the cluster
+[bootstrap-token] Creating the "cluster-info" ConfigMap in the "kube-public" namespace
+[kubelet-finalize] Updating "/etc/kubernetes/kubelet.conf" to point to a rotatable kubelet client certificate and key
+
+安装插件
+[addons] Applied essential addon: CoreDNS
+[addons] Applied essential addon: kube-proxy
+
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 192.168.0.220:6443 --token 8ivv0x.tdecpkqxm6kshc81 \
+    --discovery-token-ca-cert-hash sha256:06df0962242fd7f69f5b7cecf2569830b1a2b4938c5a4f0106a88499c43d8f28
+sleep 10s

@@ -82,4 +82,3 @@ Global Flags:
       --skip-headers             If true, avoid header prefixes in the log messages
       --skip-log-headers         If true, avoid headers when opening log files
   -v, --v Level                  number for the log level verbosity
-
