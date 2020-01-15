@@ -30,6 +30,7 @@ spec:
       containers:
         - name: redis-c
           image: redis
+          imagePullPolicy: IfNotPresent
           command:
             - "redis-server"
           args:
