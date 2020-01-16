@@ -9,7 +9,3 @@ cd /opt/kafka_2.12/bin
 
 cp ../config/server.properties ../config/server.properties-backup
 cp ../config/zookeeper.properties ../config/zookeeper.properties-backup
-
-$./zookeeper-server-start.sh -daemon ../config/zookeeper.properties
-
-$./kafka-server-start.sh -daemon ../config/server.properties
