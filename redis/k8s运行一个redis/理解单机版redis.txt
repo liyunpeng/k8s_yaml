@@ -43,7 +43,7 @@ redis-0   1/1     Running   0          30m   192.168.135.2   217-node   <none>  
 NAME      READY   STATUS    RESTARTS   AGE    IP              NODE       NOMINATED NODE   READINESS GATES
 redis-0   1/1     Running   0          109s   192.168.135.2   217-node   <none>           <none>
 
-[user1@220-node ~]$ cd /urs/local/redis/bin
+[user1@220-node ~]$ cd /usr/local/redis/bin
 [user1@220-node bin]$ ./redis-cli -h 192.168.135.2 -p 6379
 192.168.135.2:6379> set a b
 OK
