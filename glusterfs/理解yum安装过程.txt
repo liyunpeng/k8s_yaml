@@ -1,4 +1,4 @@
-先说yum的前提， repo配置文件
+先说yum的前提：repo配置文件
 repo配置文件可以手动下载，也可以直接从远端下载，推荐从远端下载，wget -O 指定了下载文件的本地存放路径，所有的repo文件都要放在/etc/yum.repos.d/目录下，这样才能被rpm, yum识别。
 $ sudo wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-8.repo
 --2020-01-04 03:45:54--  http://mirrors.aliyun.com/repo/Centos-8.repo
