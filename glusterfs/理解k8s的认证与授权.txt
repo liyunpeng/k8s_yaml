@@ -1,6 +1,5 @@
-=========================================================
 k8s的认证
-认证英文名是authetification,  认证就是对身份的认证，身份就是数字签名，认证就是对签名证书的验证。签名证书放在secrets里，secrets放在SeviceAccout里。
+认证英文名是authetification,  认证就是对身份的认证，身份就是签名证书，认证就是对签名证书的验证。签名证书放在secrets里，secrets放在SeviceAccout里。
 1. ServiceAcount的描述
 K8s世界里的所有东西，都是资源，都要用yaml文件描述，
 描述里必须有三个描述项：
