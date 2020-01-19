@@ -11,7 +11,7 @@ drwxr-xr-x 3 root root 4096 1月   7 22:15 pki
 ------------------------------------------------------------------------------------------------------------
 apiserver的yaml文件
 apiserver也是一个pod, 只不过是在kube-system 名字空间下。 既然是个pod, 就有相应的yaml文件描述。
-kubeadm init 会生成apiserver的pod描述文件;
+kubeadm init 会生成apiserver的pod描述文件：
 [master@212-node kubernetes]$ sudo cat manifests/kube-apiserver.yaml
 apiVersion: v1
 kind: Pod

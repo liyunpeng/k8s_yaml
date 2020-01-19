@@ -3,6 +3,10 @@ $./zookeeper-server-start.sh -daemon ../config/zookeeper.properties
 
 2. 修改kafka服务配置文件，启动kafka服务
 修改../config/server.properties
+第一次可以不修改broker id
+# broker.id=1
+listeners=PLAINTEXT://:9092   打开注释
+advertised.listeners=PLAINTEXT://192.168.0.204:9092  打开注释， 改kafka所在地址
 
 启动kafka服务
 $./kafka-server-start.sh -daemon ../config/server.properties
