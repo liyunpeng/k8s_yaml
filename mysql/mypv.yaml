@@ -4,9 +4,9 @@ metadata:
   name: pv001
 spec:
   capacity:
-    storage: 5Gi
+    storage: 2Gi
   accessModes:
     - ReadWriteMany
   nfs:
-    path: /nfs/
-    server: 192.168.0.204
+    path: /usr/local/k8s/redis/pv6/
+    server: 192.168.0.220
