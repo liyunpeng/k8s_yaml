@@ -1,6 +1,9 @@
 k8s的认证
-认证英文名是authetification,  认证就是对身份的认证，身份就是签名证书，认证就是对签名证书的验证。签名证书放在secrets里，secrets放在SeviceAccout里。
-1. ServiceAcount的描述
+认证英文名是authetification,  
+认证就是对身份的认证，身份是签名证书，所以认证就是对签名证书的验证。
+签名证书放在secrets或token里，secrets或token都放在SeviceAccout里。
+
+1. ServiceAcount
 K8s世界里的所有东西，都是资源，都要用yaml文件描述，
 描述里必须有三个描述项：
 kind:
@@ -8,8 +11,9 @@ apiversion:
 metadata:
 描述资源的类型，api版本号，元数据， 
 因为所有的资源都是通过api来操作，比如create， get等所有的CRUD操作，所以必须有api版本号，
-通过api, 可以远程操控资源， 即restful api范畴里的东西，资源必须有统一标识，k8s里的资源用名字和标签来标识。
-因为所有的资源都要有名字，和标签，这些都放在元数据里。 
+通过api, 可以远程操控资源， 
+即restful api范畴里的东西，资源必须有统一标识，k8s里的资源用名字和标签来标识。
+因为所有的资源都要有名字和标签，这些都放在元数据里。 
 如下是一个自定义的serviceaccount. 
 apiVersion: v1
 kind: ServiceAccount
@@ -22,8 +26,10 @@ NAME                     SECRETS   AGE
 default                  1         29h
 heketi-service-account   1         28h
 
-查看名字为default的系统默认Serviceaccount的详细描述，每个pod都有这样一个默认的Serviceaccount
-[master@212-node ~]$ kd sa default  （自定义了kd, 是kubectl describe的别名，方便敲命令，）
+查看名字为default的系统默认Serviceaccount的详细描述，
+每个pod都有这样一个默认的Serviceaccount
+[master@212-node ~]$ kd sa default  
+（自定义了kd, 是kubectl describe的别名，方便敲命令）
 Name:                default
 Namespace:           default
 Labels:              <none>
@@ -32,13 +38,28 @@ Image pull secrets:  <none>
 Mountable secrets:   default-token-24p4w
 Tokens:              default-token-24p4w
 Events:              <none>
-    ServieAccount是完成认证用的， pod在调用apiserver,挂载数据卷时，apiserver, 挂载的数据卷都需要pod提供自己的身份，
-    pod做不同的事情时，需要用不同的身份，pod调用apiserver,需要自己的身份一， 挂载数据卷时，需要身份二
-    每个身份都有一个专门的secret表示。 pod所有的secrets都放在一个专门的servieAccount集中管理
-    pod通过拥有ServiceAccount， 就拥有了这个ServiceAccount包含的所有secrets
-    上面有两个sercrets, 一个是Mountable secrets， 一个是Tokens, 虽然叫Tokens，他其实是secrets.
-    这两个sercrets是同一个secrets, 因为名字都为default-token-24p4w
-    先看下这个secrets的具体内容：
+
+ServieAccount是完成身份认证用的，包含了多个身份
+里面的secrets是一个身份，tokens也是一个身份
+上面的serviceaccount有两个身份, 一个是Mountable secrets， 一个是Tokens
+这两个身份的签名是相同, 因为名字都为default-token-24p4w
+
+每个pod都有自己的servicecount,
+pod所有的身份都放在这个servieAccount集中管理
+pod通过拥有ServiceAccount， 就拥有了这个ServiceAccount包含的所有身份
+如果没有指定用哪个serviceaccount, 系统就将系统默认的serviceaccount给这个pod。
+这个默认的serviceaccount的name为defaut. 
+
+pod在调用apiserver,挂载数据卷时，都需要pod的serviceaccount提供自己的身份，
+pod做不同的事情时，需要用不同的身份:
+pod调用apiserver,需要自己的身份一， 
+挂载数据卷时，需要身份二.
+
+----------------------------
+2. pod和apiserver之间的双向认证
+Mountable secrets和Tokens这两个身份的签名都是default-token-24p4w
+这个签名有两个证书，来完成pod和apiserver的双向验证
+看下这个签名的具体内容：
 [master@212-node ~]$ kd secrets default-token-24p4w
 Name:         default-token-24p4w
 Namespace:    default
@@ -52,10 +73,13 @@ Data
 ====
 ca.crt:     1025 bytes
 namespace:  7 bytes
-token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IkJGTTcyYmN1QklqZm1HS3JxZVZIaHFvQnF6NUxCWldnMUhGRjFvM3RnUUUifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tMjRwNHciLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjA0YjcxMWM2LTgyODgtNGQ2OS1iYTE4LWZmYzQ4NmJiZTU1YiIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.Ir889LHIkOClCdUkEKKIsdxNELiIeGQi8_GUrEI7F7r9NzOqgG1fjxNYBwXQCgKnTHuzhXtUXC_BtBL1BHFR-_hTIWrbVvGmYgaII6VSCiGctdgUyrUHKMdFbJ6gqml-17zjktpp94ZTSyZjTfcb5C6IAwvhfgNP6hT-B_9MAhT9_rKTyg4VXmcvgxryxxArBOwaExO-yRyE7OD0a9jATwx9-ICdvM4khlfzzQz8lbnExvzEmamAcL_BbwgVeEC-AviH1_jZkfHyKoUSwGfZ8qu8iP-HT3fhHRiwO15T4lKnPjMjN1Dyd-wTsMk-gZwrhZX1lsgrMj3HBToeiG6Fjg
+token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IkJGTTcyYmN1QklqZm1HS3JxZVZIaHFvQnF6NUxCWldnMUhGRjFvM3RnUUUifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tMjRwNHciLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjA0YjcxMWM2LTgyODgtNGQ2OS1iYTE4LWZmYzQ4NmJiZTU1YiIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.Ir889LHIkOClCdUkEKKIsdxNELiIeGQi8_GUrEI7F7r9NzOqgG1fjxNYBwXQCgKnTHuzhXtUXC_BtBL1BHFR-_hTIWrbVvGmYgaII6VSCiGctdgUyrUHKMdFbJ6gqml-17zjktpp94ZTSyZjTfcb5C6IAwvhfgNP6hT-B_9MAhT9_rKTyg4VXmcvgxryxxArBOwaExO-yRyE7OD0a9jATwx9-ICdvM4khlfzzQz8lbnExvzEmamAcL_BbwgVeEC-AviH1_jZkfHyKoUSwGfZ8qu8iP-HT3fhHRiwO15T4lKnPjMjN1Dyd-wTsMk-gZwrhZX1lsgrMj3HBToeiG6Fjgß
 
-  每个pod包含的serviceaccount信息都放在pod的/run/secrets/kubernetes.io/serviceaccount/目录下。该目录下有三个文件：ca.crt, token, namespace. 
-  进到pod里面看一下这三个文件：
+每个pod包含的serviceaccount信息都放在pod的
+/run/secrets/kubernetes.io/serviceaccount/目录下，
+该目录下有三个文件：ca.crt, token, namespace. 
+
+进到pod里面看一下这三个文件：
 [master@212-node ~]$ k exec -it glusterfs-jhxhp bash
 [root@217-node /]# ls /run/secrets/kubernetes.io/serviceaccount/ca.crt -l
 lrwxrwxrwx. 1 root root 13 Jan 13 15:09 /run/secrets/kubernetes.io/serviceaccount/ca.crt -> ..data/ca.crt
@@ -77,21 +101,26 @@ iTKiaqvMswo4nm0j3JPmz91tkO/j6/gCixgAGVMenNfnmvW6ZgfXVbvw0brhIWvT
 WqZNduFTPRYnY/R7UV1bU4oAgaU5twwcRIvldgr++5BEaVcHsR3x0GB4OWt2/oEr
 o62ulQf5BjQnQvsPN33v9F0sgTjSq2QOJZ66j3t99p8GZxO+aIYHuk3Pgvc=
 -----END CERTIFICATE-----  
-    ca.crt这个证书文件是用来验证apiserver发来的签名证书的，pod以此确定apiserver的身份是对的   
-    再看token:
+ca.crt这个证书文件是用来验证apiserver发来的签名证书的，pod以此确定apiserver的身份是对的   
+再看token:
 [root@217-node /]# cat /run/secrets/kubernetes.io/serviceaccount/token
-eyJhbGciOiJSUzI1NiIsImtpZCI6IkJGTTcyYmN1QklqZm1HS3JxZVZIaHFvQnF6NUxCWldnMUhGRjFvM3RnUUUifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tMjRwNHciLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjA0YjcxMWM2LTgyODgtNGQ2OS1iYTE4LWZmYzQ4NmJiZTU1YiIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.Ir889LHIkOClCdUkEKKIsdxNELiIeGQi8_GUrEI7F7r9NzOqgG1fjxNYBwXQCgKnTHuzhXtUXC_BtBL1BHFR-_hTIWrbVvGmYgaII6VSCiGctdgUyrUHKMdFbJ6gqml-17zjktpp94ZTSyZjTfcb5C6IAwvhfgNP6hT-B_9MAhT9_rKTyg4VXmcvgxryxxArBOwaExO-yRyE7OD0a9jATwx9-ICdvM4khlfzzQz8lbnExvzEmamAcL_BbwgVeEC-AviH1_jZkfHyKoUSwGfZ8qu8iP-HT3fhHRiwO15T4lKnPjMjN1Dyd-wTsMk-gZwrhZX1lsgrMj3HBToeiG6Fjg
-    这个token就是pod的签名证书，只不过是JWT格式的， 发给apiserver， apiserver以此确定pod的身份是对的。 
-    这样就完成了pod与apiserver的双向身份验证，这是k8s的高安全性的基础。
+eyJhbGciOiJSUzI1NiIsImtpZCI6IkJGTTcyYmN1QklqZm1HS3JxZVZIaHFvQnF6NUxCWldnMUhGRjFvM3RnUUUifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tMjRwNHciLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjA0YjcxMWM2LTgyODgtNGQ2OS1iYTE4LWZmYzQ4NmJiZTU1YiIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.Ir889LHIkOClCdUkEKKIsdxNELiIeGQi8_GUrEI7F7r9NzOqgG1fjxNYBwXQCgKnTHuzhXtUXC_BtBL1BHFR-_hTIWrbVvGmYgaII6VSCiGctdgUyrUHKMdFbJ6gqml-17zjktpp94ZTSyZjTfcb5C6IAwvhfgNP6hT-B_9MAhT9_rKTyg4VXmcvgxryxxArBOwaExO-yRyE7OD0a9jATwx9-ICdvM4khlfzzQz8lbnExvzEmamAcL_BbwgVeEC-AviH1_jZkfHyKoUSwGfZ8qu8iP-HT3fhHRiwO15T4lKnPjMjN1Dyd-wTsMk-gZwrhZX1lsgrMj3HBToeiG6Fjg   
+这个token就是pod的签名证书，只不过是JWT格式的，
+pod的这个签名证书发给apiserver，apiserver以此确定pod的身份是对的。 
+这样就完成了pod与apiserver的双向身份验证，这是k8s的高安全性的基础。
     
-    serviceAccoun只能在指定的namespace下有效，所以有个namespace文件描述该serviceaccount所在的namespace
-    [root@217-node /]# cat /run/secrets/kubernetes.io/serviceaccount/namespace
+serviceAccount只能在指定的namespace下有效，
+有专门的namespace文件描述该serviceaccount所在的namespace
+[root@217-node /]# cat /run/secrets/kubernetes.io/serviceaccount/namespace
 default
   
 ========================================================================= 
-   k8s的授权    
-   一个角色就是一组权限的集合，比如市长对交通局的局长有一定的权限，如果市长标签绑定到一个人，他就有了市长这个权限
-k8s世界里，也用角色来管理权限， 角色绑定到一个实体对象， 这个对象就有了权限，所以把角色绑定到某个对象， 就是对某个对象授权。
+k8s的授权    
+一个角色就是一组权限的集合，
+比如市长对交通局的局长有一定的权限，如果市长标签绑定到一个人，他就有了市长这个权限
+k8s世界里，也用角色来管理权限， 
+角色绑定到一个实体对象， 这个对象就有了权限，
+所以把角色绑定到某个对象， 就是对某个对象授权。
 这个实体对象可以是user, 也可以是serviceaccount. 
 为叙述方便 ， serviceaccount简称sa
 user是给人用的， sa是给pod用的， pod 都用有默认的sa如果需要特定的sa可以在pod定义文件yaml文件指定
